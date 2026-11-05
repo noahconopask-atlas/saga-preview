@@ -72,8 +72,6 @@ nav .sub{color:var(--muted);margin-right:14px}
 .tl{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:2px;align-items:baseline;padding-top:12px}
 .tl .t{font-weight:400;grid-column:1;text-wrap:balance}
 .nw{white-space:nowrap}
-.tl .dot{width:6px;height:6px;border-radius:50%;background:var(--fg);vertical-align:middle;margin-left:10px;display:none}
-.tile[aria-current="true"] .dot{display:inline-block}
 .tl .g{color:var(--muted)}
 .narrow .tl .g{grid-column:1 / -1}
 .wide .tl .g{grid-column:2;white-space:nowrap;padding-left:16px}
@@ -189,7 +187,7 @@ const VIMEO='https://player.vimeo.com';
 let a=0,f=0,frame=null,paused=false,swapT=null;
 
 $('rows').innerHTML=ROWS.map(r=>{const cls=r[r.length-1],ids=r.slice(0,-1),basis=cls==='wide'?440:240;
- return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="t">${tt(p.title)}<span class="dot" aria-hidden="true"></span></span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
+ return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="t">${tt(p.title)}</span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
 
 const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,label:p.title+' _ '+(fr.film||'film')});}));
 const PL=$('player'),PF=$('pframe'),PC=$('pcap');
