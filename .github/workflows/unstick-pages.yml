@@ -29,6 +29,11 @@ jobs:
               echo "  cancel id: $(curl -s -o /dev/null -w '%{http_code}' -X POST "${H[@]}" "$A/pages/deployments/$id/cancel")"
             fi
             echo "  cancel sha: $(curl -s -o /dev/null -w '%{http_code}' -X POST "${H[@]}" "$A/pages/deployments/$sha/cancel")"
+            last=$(curl -s "${H[@]}" "$A/deployments/$id/statuses?per_page=1" | jq -r '.[0].state // "none"')
+            echo "  last deployment state: $last"
+            if [ "$last" = "in_progress" ] || [ "$last" = "queued" ] || [ "$last" = "pending" ] || [ "$last" = "none" ]; then
+              echo "  mark error: $(curl -s -o /dev/null -w '%{http_code}' -X POST "${H[@]}" "$A/deployments/$id/statuses" -d '{"state":"error","description":"hung deploy cleared"}')"
+            fi
           done
           } 2>&1 | tee $GITHUB_WORKSPACE/result.txt
       - name: Report
