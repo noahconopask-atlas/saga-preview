@@ -1,0 +1,37 @@
+name: Unstick Pages deployment
+on:
+  push:
+    paths: ['.github/workflows/unstick-pages.yml']
+  workflow_dispatch:
+permissions:
+  pages: write
+  deployments: write
+  contents: write
+jobs:
+  unstick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cancel any hung Pages deployments
+        env:
+          T: ${{ secrets.GITHUB_TOKEN }}
+          R: ${{ github.repository }}
+        run: |
+          H=(-H "Authorization: Bearer $T" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+          A=https://api.github.com/repos/$R
+          {
+          curl -s "${H[@]}" "$A/deployments?environment=github-pages&per_page=15" > /tmp/d.json
+          for row in $(jq -r '.[] | "\(.id),\(.sha)"' /tmp/d.json); do
+            id=${row%,*}; sha=${row#*,}
+            st=$(curl -s "${H[@]}" "$A/pages/deployments/$id" | jq -r '.status // "?"')
+            echo "$id $sha status=$st"
+            if [ "$st" != "succeed" ] && [ "$st" != "deployment_cancelled" ] && [ "$st" != "deployment_failed" ] && [ "$st" != "?" ] && [ "$st" != "" ] || [ "$sha" = "$(git rev-parse HEAD~0 2>/dev/null)" ]; then
+              echo "  cancel id: $(curl -s -o /dev/null -w '%{http_code}' -X POST "${H[@]}" "$A/pages/deployments/$id/cancel")"
+            fi
+            echo "  cancel sha: $(curl -s -o /dev/null -w '%{http_code}' -X POST "${H[@]}" "$A/pages/deployments/$sha/cancel")"
+          done
+          } 2>&1 | tee $GITHUB_WORKSPACE/result.txt
+      - name: Report
+        run: |
+          git config user.name "pages-diag"; git config user.email "pages-diag@users.noreply.github.com"
+          cp result.txt /tmp/r.txt; git checkout -q --orphan diagb; git rm -rfq . ; cp /tmp/r.txt r.txt; git add r.txt; git commit -qm diag; git push -qf origin HEAD:refs/heads/diag
