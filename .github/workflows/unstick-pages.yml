@@ -10,6 +10,7 @@ jobs:
   unstick:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Find and cancel the hung deployment
         env:
           T: ${{ secrets.GITHUB_TOKEN }}
@@ -27,9 +28,8 @@ jobs:
           done
           echo "== cancel by sha"; curl -s -w '\n%{http_code}\n' -X POST "${H[@]}" "$A/pages/deployments/f12a8ee5c98a44efc023567e8c205efa004d96de/cancel"
           echo "== pages info"; curl -s "${H[@]}" "$A/pages" | jq -c '{status,build_type,source,html_url}'
-          } 2>&1 | tee result.txt
+          } 2>&1 | tee $GITHUB_WORKSPACE/result.txt
       - name: Save result to diag branch
         run: |
           git config user.name "pages-diag"; git config user.email "pages-diag@users.noreply.github.com"
-          git checkout --orphan diag-$GITHUB_RUN_ID && git rm -rfq . >/dev/null 2>&1 || true
-          cp result.txt r.txt 2>/dev/null || true; git add r.txt && git commit -qm diag && git push -q origin HEAD:refs/heads/diag
+          cp result.txt /tmp/r.txt; git checkout -q --orphan diagb; git rm -rfq . ; cp /tmp/r.txt r.txt; git add r.txt; git commit -qm diag; git push -qf origin HEAD:refs/heads/diag
