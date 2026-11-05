@@ -16,10 +16,10 @@ img{display:block}
 button{font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible,a:focus-visible{outline:1px solid currentColor;outline-offset:4px}
 .wrap{max-width:1280px;margin:0 auto;padding:0 clamp(20px,5vw,80px)}
-header{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:24px;padding-top:40px}
-.mark{display:block;line-height:0}.mark img{height:40px;width:auto}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:24px;padding-top:40px}
+.mark{display:inline-block;line-height:1}.mark img{display:inline-block;vertical-align:baseline;height:40px;width:auto}
 .plogo{height:14px;width:auto;display:block}
-nav{display:flex;flex-wrap:wrap;column-gap:14px;row-gap:4px;align-items:center}
+nav{display:flex;flex-wrap:wrap;column-gap:14px;row-gap:4px;align-items:baseline}
 nav a{padding:14px 0}
 nav .sub{color:var(--muted);margin-right:14px}
 .lede{padding:56px 0 40px;margin:0;color:var(--muted)}
@@ -107,7 +107,7 @@ body.screening{overflow:hidden}
 <header>
 <a class="mark" href="#" aria-label="SAGA, home"><img src="img/saga-logo.png" alt="SAGA" width="265" height="40"></a>
 <nav>
-<div class="sub">Visual and Narrative Multimedia Archive™<br>by Noah Conopask</div>
+<span class="sub">Visual and Narrative Multimedia Archive™</span>
 <a href="#index">Index</a>
 <a href="#">About</a>
 <a href="#">Contact</a>
