@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SAGA — Visual and Narrative Multimedia Archive™ by Noah Conopask</title>
+<title>SAGA _ Visual and Narrative Multimedia Archive™ by Noah Conopask</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
@@ -142,7 +142,7 @@ body.screening{overflow:hidden}
 </section>
 
 <footer>
-<span>Saga — Noah Conopask, Los Angeles</span>
+<span>Saga _ Noah Conopask, Los Angeles</span>
 <div>
 <a href="https://noah.tv">noah.tv</a>
 <a href="https://www.instagram.com/noahconopask">Instagram</a>
@@ -164,26 +164,26 @@ body.screening{overflow:hidden}
 <script>
 const I=n=>'img/'+n+'.jpg';
 const P=[
- {n:'01',title:'Absorber',tag:'Short film — identity & main titles',tile:'absorber-hi',fit:'contain',frames:[
+ {n:'01',title:'Absorber',tag:'Short film _ identity & main titles',tile:'absorber-hi',fit:'contain',frames:[
   ['ab-1-title','Absorber main title over a dark desert horizon at sunrise'],['ab-2-sheet','End title sequence, contact sheet of all credit cards'],['ab-3-written','Written, directed and scored by Noah Conopask'],['ab-4-cast','Cast credit: Grant Narasin, Annika Ross'],['ab-5-dop','Director of photography Eric Ulbrich'],['ab-6-aerials','Aerials provided by Lithium Aerials, pilot Aaron Cohan'],['ab-7-pas','Production assistants credit'],['ab-8-track','Opening track The Siren by New Ruin'],['ab-9-pillage','A Pillage Corp production']]},
  {n:'02',title:'The Company',tag:'Main titles',tile:'the-company-hi',fit:'contain',frames:[
   {vimeo:'479053999',poster:'co-1-title',alt:'The Company main title sequence',film:'Main title sequence'},
   ['co-1-title','The Company main title on hand-drawn paper texture'],['co-2-tnt','TNT presents, two hares under a drawn sky'],['co-3-sony','In association with Sony Pictures Television, a rocket launch'],['co-4-odonnell','Starring Chris O’Donnell, a drawn box'],['co-5-molina','Alfred Molina, a hare with a white eye'],['co-6-keaton','And Michael Keaton, a figure seen from above'],['co-7-calley','Executive producer John Calley, a mushroom cloud over a city'],['co-8-scott','Executive producers Ridley Scott and Tony Scott, a mushroom in grass'],['co-9-book','An open book of drawings']]},
- {n:'03',title:'Cruel Black Dove — The Myth and the Sum',tag:'Record packaging',tile:'cruel-black-dove',fit:'cover',frames:[['cruel-black-dove','Cruel Black Dove record packaging']]},
- {n:'04',title:'New Ruin — Slither',tag:'Record packaging',tile:'new-ruin-slither',fit:'cover',frames:[['new-ruin-slither','New Ruin, Slither cover']]},
+ {n:'03',title:'Cruel Black Dove _ The Myth and the Sum',tag:'Record packaging',tile:'cruel-black-dove',fit:'cover',frames:[['cruel-black-dove','Cruel Black Dove record packaging']]},
+ {n:'04',title:'New Ruin _ Slither',tag:'Record packaging',tile:'new-ruin-slither',fit:'cover',frames:[['new-ruin-slither','New Ruin, Slither cover']]},
  {n:'05',title:'Arctic Hospital',tag:'Music promo',tile:'arctic-hospital',fit:'cover',frames:[['arctic-hospital','Arctic Hospital promo, full moon over a city freeway']]},
- {n:'06',title:'Narita Records — Label Sleeve',tag:'Vinyl packaging',tile:'narita-sleeve',fit:'cover',frames:[['narita-sleeve','Narita Records 12-inch sleeve, front'],['narita-detail','Narita sleeve, detail of the yellow label in the die-cut window']]},
+ {n:'06',title:'Narita Records _ Label Sleeve',tag:'Vinyl packaging',tile:'narita-sleeve',fit:'cover',frames:[['narita-sleeve','Narita Records 12-inch sleeve, front'],['narita-detail','Narita sleeve, detail of the yellow label in the die-cut window']]},
  {n:'07',title:'American Symphony',tag:'Film identity & main titles',tile:'american-symphony-hi',fit:'contain',aspect:'16 / 9',frames:[
   ['as-1-title','American Symphony main title over a pale sky with a line of birds'],['as-2-netflix','A Netflix Documentary title card'],['as-3-heineman','A film by Matthew Heineman, over a close profile of Jon Batiste'],['as-4-batiste','Music by Jon Batiste, over a lake at dusk'],['as-5-ourtime','An Our Time Projects production, over moving water'],['as-6-endcard','End title card']]},
  {n:'08',title:'Totality',tag:'Film identity & main titles',tile:'totality',fit:'cover',frames:[['totality','Totality wordmark with construction guides']]},
- {n:'09',title:'Anders Ilar — Nightwidth',tag:'Record packaging',tile:'anders-ilar',fit:'cover',frames:[['anders-1','Nightwidth box set, front'],['anders-2','Nightwidth box set, back'],['anders-3','Nightwidth stencil type, detail'],['anders-4','Nightwidth stencil type, angle'],['anders-5','Nightwidth stencil type, close']]},
+ {n:'09',title:'Anders Ilar _ Nightwidth',tag:'Record packaging',tile:'anders-ilar',fit:'cover',frames:[['anders-1','Nightwidth box set, front'],['anders-2','Nightwidth box set, back'],['anders-3','Nightwidth stencil type, detail'],['anders-4','Nightwidth stencil type, angle'],['anders-5','Nightwidth stencil type, close']]},
  {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit',fit:'cover',frames:[['revit','Rider in a flame-painted helmet']]},
  {n:'11',title:'Logos',tag:'Brand identity',tile:'logos',fit:'cover',frames:[['logos','noah.tv logomark usage guidelines']]},
- {n:'12',title:'Merck Records — Label Sleeve',tag:'Vinyl packaging',tile:'merck',fit:'cover',frames:[['merck','Merck Records sleeve, hand-drawn line work with a blue logo']]}
+ {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck',fit:'cover',frames:[['merck','Merck Records sleeve, hand-drawn line work with a blue logo']]}
 ].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film})}));
 const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,'wide'],[8,9,10,11,'narrow']];
 const $=id=>document.getElementById(id);
-const tt=t=>t.split(' — ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' — ');
+const tt=t=>t.split(' _ ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' _ ');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VIMEO='https://player.vimeo.com';
 let a=0,f=0,frame=null,paused=false,swapT=null;
@@ -191,7 +191,7 @@ let a=0,f=0,frame=null,paused=false,swapT=null;
 $('rows').innerHTML=ROWS.map(r=>{const cls=r[r.length-1],ids=r.slice(0,-1),basis=cls==='wide'?440:240;
  return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="t">${tt(p.title)}<span class="dot" aria-hidden="true"></span></span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
 
-const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,label:p.title+' — '+(fr.film||'film')});}));
+const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,label:p.title+' _ '+(fr.film||'film')});}));
 const PL=$('player'),PF=$('pframe'),PC=$('pcap');
 let vi=0,lastFocus=null,pswapT=null;
 function send(cmd){if(frame&&frame.contentWindow)frame.contentWindow.postMessage(JSON.stringify(cmd),VIMEO);}
