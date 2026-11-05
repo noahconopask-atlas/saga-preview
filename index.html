@@ -65,18 +65,21 @@ nav .sub{color:var(--muted);margin-right:14px}
 #index{padding:112px 0 120px;display:flex;flex-direction:column;gap:48px}
 .ihead{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--rule);padding-top:12px;color:var(--muted)}
 .ihead b{color:var(--fg);font-weight:400}
-.row{display:flex;flex-wrap:wrap;gap:40px 24px}
+#rows{display:flex;flex-direction:column;gap:88px}
+.row{display:flex;flex-wrap:wrap;gap:64px 24px}
 .tile{display:block;width:100%;text-align:left}
 .tile img{width:100%;aspect-ratio:3/2;object-fit:cover;transition:opacity .2s}
 .tile:hover img{opacity:.8}
-.tl{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;padding-top:10px}
+.tl{display:grid;grid-template-columns:2ch minmax(0,1fr) auto;column-gap:12px;row-gap:2px;align-items:baseline;padding-top:12px}
 .tl .n{color:var(--muted);font-variant-numeric:tabular-nums;min-width:2ch}
-.tl .t{font-weight:400}
-.tl .dot{width:6px;height:6px;border-radius:50%;background:var(--fg);align-self:center;display:none}
+.tl .t{font-weight:400;grid-column:2;text-wrap:balance}
+.nw{white-space:nowrap}
+.tl .dot{width:6px;height:6px;border-radius:50%;background:var(--fg);vertical-align:middle;margin-left:10px;display:none}
 .tile[aria-current="true"] .dot{display:inline-block}
 .tl .g{color:var(--muted)}
-.narrow .tl .g{flex-basis:100%;padding-left:calc(2ch + 12px)}
-.wide .tl .g{margin-left:auto}
+.narrow .tl .g{grid-column:2 / -1}
+.wide .tl .g{grid-column:3;white-space:nowrap;padding-left:16px}
+@media (max-width:700px){.wide .tl .g{grid-column:2 / -1;padding-left:0;white-space:normal}}
 footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;padding:16px 0 40px;border-top:1px solid var(--rule);color:var(--muted)}
 footer div{display:flex;flex-wrap:wrap;gap:28px}
 /* screening room */
@@ -183,12 +186,13 @@ const P=[
 ].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film})}));
 const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,'wide'],[8,9,10,11,'narrow']];
 const $=id=>document.getElementById(id);
+const tt=t=>t.split(' — ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' — ');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VIMEO='https://player.vimeo.com';
 let a=0,f=0,frame=null,paused=false,swapT=null;
 
 $('rows').innerHTML=ROWS.map(r=>{const cls=r[r.length-1],ids=r.slice(0,-1),basis=cls==='wide'?440:240;
- return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="n">${p.n}</span><span class="t">${esc(p.title)}</span><span class="dot" aria-hidden="true"></span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
+ return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="n">${p.n}</span><span class="t">${tt(p.title)}<span class="dot" aria-hidden="true"></span></span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
 
 const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,label:p.title+' — '+(fr.film||'film')});}));
 const PL=$('player'),PF=$('pframe'),PC=$('pcap');
@@ -264,7 +268,7 @@ function markThumb(){
  if(l<c.scrollLeft)c.scrollTo({left:l-4});else if(r>c.scrollLeft+c.clientWidth)c.scrollTo({left:r-c.clientWidth+4});
 }
 function renderCaption(){
- const p=P[a];$('cn').textContent=p.n;$('ct').textContent=p.title;$('cg').textContent=p.tag;
+ const p=P[a];$('cn').textContent=p.n;$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;
  $('counter').textContent=p.n+' / 12';
  document.querySelectorAll('.tile').forEach(t=>t.setAttribute('aria-current',+t.dataset.i===a));
 }
