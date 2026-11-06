@@ -175,7 +175,7 @@ const P=[
  {n:'09',title:'Anders Ilar _ Nightwidth',tag:'Record packaging',tile:'anders-ilar',fit:'cover',frames:[['anders-1','Nightwidth box set, front'],['anders-2','Nightwidth box set, back'],['anders-3','Nightwidth stencil type, detail'],['anders-4','Nightwidth stencil type, angle'],['anders-5','Nightwidth stencil type, close']]},
  {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit',fit:'cover',frames:[['revit','Rider in a flame-painted helmet']]},
  {n:'11',title:'Logos',tag:'Brand identity',tile:'logos',fit:'cover',frames:[['logos','noah.tv logomark usage guidelines'],['logo-absorber','Absorber wordmark'],['logo-leaf','Three-leaf mark'],['logo-noahtv','noah.tv logomark'],['logo-narita','Narita Records wordmark'],['logo-totality','Totality wordmark']]},
- {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck',fit:'cover',frames:[['merck','Merck Records sleeve, hand-drawn line work with a blue logo']]}
+ {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck-tile',fit:'cover',frames:[['merck-1','Merck Records 12-inch sleeve, hand-drawn line work with a blue logo, front']]}
 ].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film})}));
 const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,'wide'],[8,9,10,11,'narrow']];
 const $=id=>document.getElementById(id);
