@@ -40,7 +40,7 @@ nav .sub{color:var(--muted);margin-right:14px}
 .stage .hit{position:absolute;inset:0;width:100%;height:100%;z-index:2}
 .stage .play{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;color:#fff;pointer-events:none}
 .stage.live .play{opacity:0;pointer-events:none}
-.stage .play span{width:84px;height:84px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center}
+.stage .play span{display:flex;align-items:center;justify-content:center}
 .trow{display:flex;align-items:center;gap:4px;padding-top:10px}
 .trow .icon{flex:0 0 auto}
 .trow .icon[hidden]{display:none}
@@ -244,7 +244,7 @@ function renderStage(){
  st.classList.toggle('cover',p.fit==='cover');
  st.classList.remove('live');frame=null;
  if(fr.vimeo){
-  st.innerHTML=`<img src="${fr.src}" alt="${esc(fr.alt)}" style="opacity:.55"><button type="button" class="hit openfilm" aria-label="Play ${esc(p.title)}, ${esc(fr.film||'film')}"></button><span class="play" aria-hidden="true"><span><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span></span>`;
+  st.innerHTML=`<img src="${fr.src}" alt="${esc(fr.alt)}" style="opacity:.55"><button type="button" class="hit openfilm" aria-label="Play ${esc(p.title)}, ${esc(fr.film||'film')}"></button><span class="play" aria-hidden="true"><span><svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span></span>`;
  }else{
   st.innerHTML=`<button type="button" class="still" aria-label="Next image"><img src="${fr.src}" alt="${esc(fr.alt)}"></button>`;
 
