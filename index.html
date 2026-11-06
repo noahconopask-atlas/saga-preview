@@ -86,7 +86,7 @@ body.screening{overflow:hidden}
 .ptop .pcount{justify-self:end;color:var(--muted);font-variant-numeric:tabular-nums}
 .pmid{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;gap:clamp(8px,6vw,160px);padding:0 clamp(8px,2vw,28px)}
 .pmid .icon:disabled{opacity:.25;cursor:default}
-.pframe{position:relative;flex:0 1 auto;width:min(1650px,calc(100vw - 200px),calc((100vh - 230px) * 16 / 9));aspect-ratio:16/9;background:#000;overflow:hidden;transition:opacity .45s ease}
+.pframe{position:relative;flex:0 1 auto;width:min(1650px,calc(100vw - 200px),calc((100vh - 230px) * var(--arn,1.7778)));aspect-ratio:var(--ar,16/9);background:#000;overflow:hidden;transition:opacity .45s ease}
 .pframe.swap{opacity:0}
 .pframe img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .pframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;transition:opacity .9s ease}
@@ -173,10 +173,10 @@ const P=[
   ['ab-1-title','Absorber main title over a dark desert horizon at sunrise'],['ab-2-sheet','End title sequence, contact sheet of all credit cards'],['ab-3-written','Written, directed and scored by Noah Conopask'],['ab-4-cast','Cast credit: Grant Narasin, Annika Ross'],['ab-5-dop','Director of photography Eric Ulbrich'],['ab-6-aerials','Aerials provided by Lithium Aerials, pilot Aaron Cohan'],['ab-7-pas','Production assistants credit'],['ab-8-track','Opening track The Siren by New Ruin'],['ab-9-pillage','A Pillage Corp production']]},
  {n:'08',title:'Totality',tag:'Film identity & main titles',tile:'totality',fit:'cover',frames:[['totality','Totality wordmark with construction guides']]},
  {n:'09',title:'Anders Ilar _ Nightwidth',tag:'Record packaging',tile:'anders-ilar',fit:'cover',frames:[['anders-1','Nightwidth box set, front'],['anders-2b','Nightwidth box set, back cover'],['anders-3','Nightwidth stencil type, detail'],['anders-4','Nightwidth stencil type, angle'],['anders-5','Nightwidth stencil type, close']]},
- {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit',fit:'cover',frames:[['revit','Rider in a flame-painted helmet']]},
+ {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit-tile',fit:'cover',frames:[{vimeo:'477161035',poster:'revit-poster',alt:"REV'IT!, The Reason, Super 8 film",film:'The Reason',ar:'4/3'},['revit','Rider in a flame-painted helmet']]},
  {n:'11',title:'Logos',tag:'Brand identity',tile:'logo-mark',fit:'cover',frames:[['logo-mark','Monogram logo'],['logos','noah.tv logomark usage guidelines'],['logo-absorber','Absorber wordmark'],['logo-leaf','Three-leaf mark'],['logo-noahtv','noah.tv logomark'],['logo-narita','Narita Records wordmark'],['logo-totality','Totality wordmark']]},
  {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck-tile',fit:'cover',frames:[['merck-1','Merck Records 12-inch sleeve, hand-drawn line work with a blue logo, front']]}
-].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film})}));
+].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film,ar:f.ar})}));
 const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,'wide'],[8,9,10,11,'narrow']];
 const $=id=>document.getElementById(id);
 const tt=t=>t.split(' _ ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' _ ');
@@ -187,7 +187,7 @@ let a=0,f=0,frame=null,paused=false,swapT=null;
 $('rows').innerHTML=ROWS.map(r=>{const cls=r[r.length-1],ids=r.slice(0,-1),basis=cls==='wide'?440:240;
  return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="t">${tt(p.title)}</span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
 
-const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,label:p.title+' _ '+(fr.film||'film')});}));
+const VIDS=[];P.forEach((p,pi)=>p.frames.forEach((fr,fi)=>{if(fr.vimeo)VIDS.push({a:pi,f:fi,id:fr.vimeo,client:p.title,title:fr.film||'Film',poster:fr.src,ar:fr.ar,label:p.title+' _ '+(fr.film||'film')});}));
 const PL=$('player'),PF=$('pframe'),PC=$('pcap');
 let vi=0,lastFocus=null,pswapT=null;
 function send(cmd){if(frame&&frame.contentWindow)frame.contentWindow.postMessage(JSON.stringify(cmd),VIMEO);}
@@ -199,6 +199,7 @@ function loadFilm(){
  const one=VIDS.length<2;$('pprev').disabled=one;$('pnext').disabled=one;
  const url=`${VIMEO}/video/${v.id}?autoplay=1&controls=0&title=0&byline=0&portrait=0&badge=0&vimeo_logo=0&sidedock=0&pip=0&loop=0&autopause=1&dnt=1&texttrack=false&api=1&player_id=p${v.id}`;
  PF.classList.remove('live');
+ {const [w,h]=(v.ar||'16/9').split('/').map(Number);PF.style.setProperty('--ar',w+'/'+h);PF.style.setProperty('--arn',(w/h).toFixed(4));}
  PF.innerHTML=`<img src="${v.poster}" alt=""><iframe src="${url}" title="${esc(v.label)}" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe><button type="button" class="hit" aria-label="Pause or resume ${esc(v.label)}"></button>`;
  frame=PF.querySelector('iframe');
  frame.addEventListener('load',()=>setTimeout(()=>PF.classList.add('live'),600));
