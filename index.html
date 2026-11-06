@@ -183,7 +183,8 @@ const $=id=>document.getElementById(id);
 const tt=t=>t.split(' _ ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' _ ');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VIMEO='https://player.vimeo.com';
-let a=0,f=0,frame=null,paused=false,swapT=null;
+const START=Math.max(0,P.findIndex(p=>p.title.startsWith('Cruel Black Dove')));
+let a=START,f=0,frame=null,paused=false,swapT=null;
 
 $('rows').innerHTML=ROWS.map(r=>{const cls=r[r.length-1],ids=r.slice(0,-1),basis=cls==='wide'?440:240;
  return `<div class="row ${cls}">`+ids.map(i=>{const p=P[i];return `<article style="flex:1 1 ${basis}px;min-width:0"><button type="button" class="tile" data-i="${i}"><img loading="lazy" src="${I(p.tile)}" alt="${esc(p.frames[0].alt)}"><span class="tl"><span class="t">${tt(p.title)}</span><span class="g">${esc(p.tag)}</span></span></button></article>`;}).join('')+'</div>';}).join('');
@@ -281,7 +282,7 @@ function open(i,scroll){
 function home(){
  closeFilm();clearTimeout(swapT);
  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
- if(a!==0||f!==0){a=0;f=0;renderCaption();renderThumbs();renderStage();}
+ if(a!==START||f!==0){a=START;f=0;renderCaption();renderThumbs();renderStage();}
  scrollTo({top:0,behavior:'smooth'});
 }
 document.addEventListener('click',e=>{
