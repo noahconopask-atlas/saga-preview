@@ -45,6 +45,11 @@ nav .sub{color:var(--muted);margin-right:14px}
 .stage .play{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;color:#fff;pointer-events:none}
 .stage.live .play{opacity:0;pointer-events:none}
 .stage .play span{display:flex;align-items:center;justify-content:center}
+.stage .xf{position:absolute;inset:0;z-index:4;background:#000;opacity:0;transition:opacity 1.2s ease;pointer-events:none}
+.stage .xf.on{opacity:1}
+.stage .xf>img,.stage .xf .still img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.stage .xf.cover>img,.stage .xf.cover .still img{object-fit:cover}
+.stage .xf:not(.cover) .still img{object-fit:contain}
 .trow{display:flex;align-items:center;gap:4px;padding-top:10px}
 .trow .icon{flex:0 0 auto}
 .trow .icon[hidden]{display:none}
@@ -243,18 +248,45 @@ addEventListener('keydown',e=>{if(!PL.classList.contains('on'))return;
  else if(e.key===' '&&!e.target.closest('button')){e.preventDefault();toggle();}
  else if(e.key==='Tab'){const b=[...PL.querySelectorAll('button:not([disabled])')].filter(x=>x.offsetParent);if(!b.length)return;const i=b.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();b[b.length-1].focus();}else if(!e.shiftKey&&i===b.length-1){e.preventDefault();b[0].focus();}}
 });
+function stageHTML(p,fr){
+ if(fr.vimeo){
+  return `<img src="${fr.src}" alt="${esc(fr.alt)}" style="opacity:.55"><button type="button" class="hit openfilm" aria-label="Play ${esc(p.title)}, ${esc(fr.film||'film')}"></button><span class="play" aria-hidden="true"><span><svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span></span>`;
+ }
+ return `<button type="button" class="still" aria-label="Next image"><img src="${fr.src}" alt="${esc(fr.alt)}"></button>`;
+}
 function renderStage(){
  const p=P[a],fr=p.frames[f],st=$('stage');
- st.style.aspectRatio=p.aspect||'3 / 2';
+ st.style.aspectRatio=auto?'3 / 2':(p.aspect||'3 / 2');
  st.classList.toggle('cover',p.fit==='cover');
  st.classList.remove('live');frame=null;
- if(fr.vimeo){
-  st.innerHTML=`<img src="${fr.src}" alt="${esc(fr.alt)}" style="opacity:.55"><button type="button" class="hit openfilm" aria-label="Play ${esc(p.title)}, ${esc(fr.film||'film')}"></button><span class="play" aria-hidden="true"><span><svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span></span>`;
- }else{
-  st.innerHTML=`<button type="button" class="still" aria-label="Next image"><img src="${fr.src}" alt="${esc(fr.alt)}"></button>`;
-
- }
+ st.innerHTML=stageHTML(p,fr);
 }
+// landing-page preview: hold each project's lead image, cross-fade to the next
+let auto=false,autoT=null,xfT=null;
+const HOLD=4200,FADE=1200,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function preload(n){const im=new Image();im.src=P[n].frames[0].src;}
+function schedule(){clearTimeout(autoT);preload((a+1)%P.length);autoT=setTimeout(step,HOLD);}
+function step(){
+ if(!auto||document.hidden)return;
+ const n=(a+1)%P.length,p=P[n],st=$('stage');
+ const d=document.createElement('div');d.className='xf'+(p.fit==='cover'?' cover':'');
+ d.innerHTML=stageHTML(p,p.frames[0]);st.appendChild(d);d.offsetWidth;d.classList.add('on');
+ xfT=setTimeout(()=>{
+  if(!auto)return;
+  a=n;f=0;renderCaption();renderThumbs();
+  [...st.children].forEach(c=>{if(c!==d)c.remove();});
+  while(d.firstChild)st.insertBefore(d.firstChild,d);d.remove();
+  st.classList.toggle('cover',p.fit==='cover');st.classList.remove('live');frame=null;
+  schedule();
+ },FADE);
+}
+function startAuto(){if(RM||P.length<2)return;auto=true;renderStage();schedule();}
+function stopAuto(){
+ if(!auto)return;auto=false;clearTimeout(autoT);clearTimeout(xfT);
+ $('stage').querySelectorAll('.xf').forEach(x=>x.remove());
+ renderStage();
+}
+document.addEventListener('visibilitychange',()=>{if(auto&&!document.hidden)schedule();});
 function renderThumbs(){
  const p=P[a],many=p.frames.length>1;
  $('trow').style.display=many?'':'none';
@@ -284,12 +316,14 @@ function open(i,scroll){
  if(scroll)$('viewer').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function home(){
- closeFilm();clearTimeout(swapT);
+ stopAuto();closeFilm();clearTimeout(swapT);
  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
  if(a!==START||f!==0){a=START;f=0;renderCaption();renderThumbs();renderStage();}
  scrollTo({top:0,behavior:'smooth'});
+ startAuto();
 }
 document.addEventListener('click',e=>{
+ if(e.target.closest('button,a,.tile')&&!e.target.closest('a.home'))stopAuto();
  if(e.target.closest('a.home')&&!(e.metaKey||e.ctrlKey||e.shiftKey)){e.preventDefault();home();return;}
  const tile=e.target.closest('.tile');if(tile){open(+tile.dataset.i,true);return;}
  if(e.target.closest('.pclose')){closeFilm();return;}
@@ -304,7 +338,7 @@ document.addEventListener('click',e=>{
  else if(e.target.closest('#tback'))$('thumbs').scrollBy({left:-$('thumbs').clientWidth*.8});
  else if(e.target.closest('#tfwd'))$('thumbs').scrollBy({left:$('thumbs').clientWidth*.8});
 });
-renderCaption();renderThumbs();renderStage();
+renderCaption();renderThumbs();renderStage();startAuto();
 </script>
 </body>
 </html>
