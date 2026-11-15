@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>New Ruin — Transmission</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--fg:rgba(236,236,236,.74);--dim:rgba(236,236,236,.36);--line:rgba(255,255,255,.16);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#020202;overflow:hidden;color:var(--fg);
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
+#grid,#wall{position:fixed;display:block}
+.vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(130% 95% at 50% 48%,transparent 52%,rgba(0,0,0,.78))}
+
+.hud{position:fixed;left:0;right:0;display:flex;justify-content:space-between;gap:16px;
+  font-size:10.5px;line-height:1.55;letter-spacing:.18em;text-transform:uppercase;pointer-events:none;z-index:5;
+  padding-left:calc(18px + env(safe-area-inset-left));padding-right:calc(18px + env(safe-area-inset-right))}
+.top{top:0;padding-top:calc(16px + env(safe-area-inset-top));align-items:center}
+.bottom{bottom:0;padding-bottom:calc(16px + env(safe-area-inset-bottom));align-items:flex-end}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{display:block;height:17px;width:auto;opacity:.75}
+.tm{text-transform:none;letter-spacing:.12em}
+.brand b{font-weight:500;color:rgba(255,255,255,.92);letter-spacing:.32em}
+.dim{color:var(--dim)}
+.r{text-align:right}
+.live i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#e8e8e8;margin-right:8px;vertical-align:1px;animation:blink 1.4s steps(2,jump-none) infinite}
+.paused .live i{animation:none;background:#555}
+@keyframes blink{50%{opacity:.15}}
+.prog{display:flex;flex-wrap:wrap;gap:2px;margin-top:7px;max-width:260px}
+.prog b{width:7px;height:3px;background:rgba(255,255,255,.16)}
+.prog b.on{background:rgba(255,255,255,.85)}
+.prog b.now{background:#fff;outline:1px solid #fff}
+.ctrls{display:flex;gap:6px;pointer-events:auto}
+.ctrls button{background:none;border:0;color:var(--fg);font:inherit;letter-spacing:inherit;
+  text-transform:inherit;padding:9px 12px;cursor:pointer;border-radius:0;-webkit-tap-highlight-color:transparent}
+.ctrls button:hover{color:#fff}
+.ctrls button:focus-visible{outline:1px solid #fff;outline-offset:2px}
+.ctrls button[aria-pressed="true"]{color:#fff;text-decoration:underline;text-underline-offset:5px}
+
+#panel{position:fixed;inset:0;z-index:10;background:rgba(2,2,2,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  overflow:auto;display:none;padding:calc(64px + env(safe-area-inset-top)) 24px calc(64px + env(safe-area-inset-bottom))}
+#panel.open{display:block}
+#panel .in{max-width:34em;margin:0 auto}
+#panel .meta{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+#panel h2{font-weight:500;font-size:15px;letter-spacing:.28em;text-transform:uppercase;color:#fff;margin:8px 0 34px}
+#panel p{font-size:15px;line-height:1.75;margin:0 0 1.5em;color:rgba(236,236,236,.88)}
+#panel .x button{flex:none;padding:9px 12px;text-transform:uppercase;letter-spacing:.18em;font-size:10.5px}
+#panel nav button{text-transform:uppercase;letter-spacing:.14em;font-size:10.5px}
+#panel .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:calc(18px + env(safe-area-inset-right))}
+#panel nav{display:flex;gap:6px;margin-bottom:40px;flex-wrap:wrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  .hud{font-size:9.5px;letter-spacing:.14em}
+  .bottom{flex-direction:column;align-items:stretch;gap:12px}
+  .ctrls button{flex:1;padding:11px 0}
+  .hide-s{display:none}
+  .logo{height:12px}
+  .brand{gap:10px}
+}
+</style>
+</head>
+<body>
+<canvas id="grid" aria-hidden="true"></canvas>
+<canvas id="wall" role="img" aria-label="LED wall displaying poems from the New Ruin journal"></canvas>
+<div class="vig"></div>
+
+<header class="hud top" id="hudTop">
+  <div class="brand"><img class="logo" alt="New Ruin" src="data:image/png;base64,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"></div>
+  <div class="r"><span class="dim tm">ArtifactArchive™</span><span class="dim" id="tc" style="margin-left:14px">00:00:00:00</span></div>
+</header>
+
+<footer class="hud bottom" id="hudBot">
+  <div>
+    <span id="code">—</span> <span class="dim" id="meta"></span><br>
+    <span class="dim" id="mode">Boot</span>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="ctrls">
+    <button id="bPrev" aria-label="Previous poem">Prev</button>
+    <button id="bPlay" aria-label="Pause">Pause</button>
+    <button id="bNext" aria-label="Next poem">Next</button>
+    <button id="bText" aria-label="Read the text">Text</button>
+  </div>
+</footer>
+
+<section id="panel" aria-label="Poem text" aria-hidden="true">
+  <div class="ctrls x"><button id="bClose">Close</button></div>
+  <div class="in" id="panelIn"></div>
+</section>
+<div class="sr" aria-live="polite" id="sr"></div>
+
+<script>
+(()=>{
+'use strict';
+const POEMS = [{"id": "092324", "code": "JP_092324", "title": "", "date": "09.23.24", "stanzas": [["The words I say", "Will be what is known."], ["Today,", "so much to do,", "This changes", "what comes out,", "Corrupts the process."], ["Maybe all the same,", "I need to relax,", "Let it go,", "Settle in."], ["More information, just in,", "Less input needed, wanted,", "To maximize output."], ["Feeling less groggy,", "Not fully awake."], ["So much to do,", "I don’t know", "If I can do it."], ["I make the schedule,", "I make the plan.", "I plan until", "I have no idea where I am", "Some days excited,", "Some days exhausted,", "Stressed."], ["I don’t know how I feel", "Anymore."], ["Hard to keep focused,", "What will be", "The outcome?"], ["Why am I doing this?", "For myself,", "Or another reason?"], ["Hard to tell"], ["If I’m my own master"], ["Sculpted metal marble"], ["Or maybe just plaster"], ["Crushed by", "the unmovable weight"], ["of other masters"], ["Is this what I want?", "Or what I’m manipulated to do?"], ["Perhaps I’ll find out", "In the process,", "Perhaps that’s where", "The truth lies."], ["I KNOW", "I want to finish.", "I want a new chapter,", "I want to move on,", "I want a new start,", "A new way-"], ["A proclamation -", "Written,", "as my pen is dying", "The words on the page..", "scratching their way", "into invisibility."], ["Strokes,", "Depressions,", "Not letters,", "Just signs", "Of pressure", "Applied to a page."], ["A page of words,", "Scribbled", "Without the intent", "To be legible", "Or read."]]}, {"id": "092424", "code": "JP_092424", "title": "", "date": "09.24.24", "stanzas": [["Clear this morning.", "The world still sleeps, wrapped in fog.", "I’m unsure how to begin the day,", "but I keep moving."], ["Perhaps I’m just killing time.", "Unlikely, I’ll find the right fit,", "but I shouldn’t overthink", "like I always do."], ["It’s a constant struggle,", "this overthinking.", "Yesterday, I faced rejection.", "Perhaps it’s for the best.", "There’s still more to go."], ["Today, I’ll keep pushing forward.", "The news is bleak,", "each release a problem.", "Right now, the news is true.", "Is it speaking to us?"], ["We can’t rely on what we’ve always known.", "We must move forward from here.", "The world is changing,", "and so must we."], ["Focus more.", "Learn more about money.", "Isn’t that right?", "Money:", "the only true measure of success", "in society."], ["What state are we in?", "What is the culture?", "Is this just humanity."], ["Those who live in abundance", "are the ones celebrated,", "whether they’ve earned it or not.", "They say:", "it’s just the way it is."], ["We all clamor up", "the mountain of access", "but never reach the summit."], ["The rocks,", "the dirt,", "the dust,", "fall away", "as we scratch and climb."], ["The holy rock.", "We’d take it,", "if only we weren’t so obsessed.", "Seeing red,", "trying to have it all.", "It means nothing."], ["But people are unfortunate this way:", "clamoring for what they see others clamor for."], ["Today, I don’t want to clamor.", "I want to work on myself.", "Work on these words."], ["These words keep me grounded."], ["The world could use fewer comments", "and more thoughts.", "Real and raw."], ["From the flesh.", "Not hammered onto plastic keys,", "silently screaming.", "Electric messages sent", "to each other", "with no charge."], ["Communication has always been imperfect.", "And now, with its algorhythmic delivery,", "it’s worse."], ["Its meanings destroyed", "as we step on each other’s backs", "like ants", "running for rotten fruit—"], ["but instead,", "sucking down poison in the trap,", "ravenous,", "churning black", "in our own remains."], ["Until the pile goes silent.", "Most are dead,", "but a few return to the nest,", "poisoning the rest."], ["It’s absolutely silent.", "The sun begins to rise.", "The clouds and fog keep the light soft.", "Everything painted in cool gray,", "and it’s beautiful."], ["The atmosphere.", "The gentle, cool morning.", "The most peaceful time I have."], ["My dogs at my sides as I write.", "I can hear them breathing."], ["Sometimes they dream,", "and speak to me.", "Twitching,", "as they run", "through another world."]]}, {"id": "092524", "code": "JP_092524", "title": "Invisible Concrete", "date": "09.25.24", "stanzas": [["I’ll turn this curse into a gift.", "How do I transcend", "the experiences I've had", "And become more", "than just the weight", "Tying me", "to the same", "deep,", "jagged post."], ["The glass ceiling", "Becomes frostier with every passing day.", "I could once see the sky through it,", "But now I only see the uneven,", "sharp patterns of ice crystals,", "Layering and building atop one another,", "Pulling moisture from the air,", "An invisible concrete."], ["I feel like I have so much to share,", "But as a conduit, I can only allow so much out.", "The bottleneck is my will.", "The thoughts, good,", "But the pressure to be a factory", "Is overwhelming."], ["Is anything meant to be enjoyed,", "Or is life just about production?", "We have this consciousness,", "Aren’t we, as souls, meant", "for something more?", "Maybe \"meant\" is too loaded,", "Too mechanical? Too divine?"], ["What is spirituality,", "But a faithful belief", "In something too sophisticated for us", "To ever understand.", "And would knowing be worse anyway?"], ["I wake and create what I can.", "Because I must."], ["I have to feed this body.", "I have to feed this mission.", "And see."], ["The purpose I feel is somehow", "Both painful and powerful.", "This duality is confusing,", "And both can be intoxicating."], ["I see balance.", "I work to feel whole,", "To see and be seen.", "Again."]]}];
+
+/* ---------- direction: where the data walls land, and hand-picked scene modes ---------- */
+const DIRECTION = {
+  '092324': {
+    walls: [
+      {after:'To maximize output', phrase:'LESS INPUT. MAXIMIZE OUTPUT', tail:'units'},
+      {after:'of other masters', phrase:"IF I'M MY OWN MASTER", tail:'code'},
+      {after:'Applied to a page', phrase:'SIGNS OF PRESSURE', tail:'psi'},
+    ],
+    modes: {
+      'More information, just in,': {mode:'tally'},
+      'I make the schedule,': {mode:'list'},
+      'I KNOW': {mode:'list'},
+      'A proclamation -': {mode:'list'},
+      'Strokes,': {mode:'seq'},
+      'A page of words,': {mode:'scatter'},
+      'Crushed by': {mode:'resolve', col:'R', haze:'red'},
+    },
+    marks: {'Corrupts':'tangle','Let it go':'circle','maximize output':'strike','Not fully awake':'underline',
+      'I plan until':'underline','Stressed':'coil','Anymore':'circle','Why am I doing this?':'underline',
+      'my own master':'circle','plaster':'scrub','unmovable weight':'underline','manipulated':'scratch',
+      'The truth lies':'circle','I KNOW':'underline','a new start':'circle','proclamation':'underline',
+      'invisibility':'tangle','pressure':'circle','legible':'scrub'}
+  },
+  '092424': {
+    walls: [
+      {after:'in society.', phrase:'MONEY: THE ONLY TRUE MEASURE OF SUCCESS', tail:'usd'},
+      {after:'but never reach the summit.', phrase:'THE MOUNTAIN OF ACCESS', tail:'code'},
+      {after:'with no charge.', phrase:'ELECTRIC MESSAGES WITH NO CHARGE', tail:'code'},
+    ],
+    modes: {
+      'Today, I’ll keep pushing forward.': {mode:'tally'},
+      'Focus more.': {mode:'list'},
+      'The rocks,': {mode:'tally'},
+      'The holy rock.': {mode:'seq', col:'R', haze:'red'},
+      'From the flesh.': {mode:'list'},
+      'Communication has always been imperfect.': {mode:'scatter'},
+      'but instead,': {mode:'scatter'},
+      'It’s absolutely silent.': {mode:'seq'},
+      'Sometimes they dream,': {mode:'seq'},
+    },
+    marks: {'fog':'circle','overthinking':'tangle','rejection':'hatch','bleak':'underline','money':'circle',
+      'measure of success':'strike','abundance':'underline','mountain of access':'circle','summit':'x',
+      'holy rock':'circle','It means nothing':'underline','clamor':'coil','grounded':'underline',
+      'Real and raw':'circle','plastic keys':'strike','no charge':'underline','algorhythmic':'circle',
+      'poison':'scrub','churning black':'underline','silent':'circle','cool gray':'underline',
+      'beautiful':'circle','another world':'underline'}
+  },
+  '092524': {
+    walls: [
+      {after:'An invisible concrete.', phrase:'INVISIBLE CONCRETE', tail:'psi'},
+      {after:'Is overwhelming.', phrase:'THE PRESSURE TO BE A FACTORY', tail:'units'},
+      {after:'Again.', phrase:'TO SEE AND BE SEEN', tail:'code'},
+    ],
+    modes: {
+      'I’ll turn this curse into a gift.': {mode:'list'},
+      'The glass ceiling': {mode:'scatter'},
+      'I feel like I have so much to share,': {mode:'tally'},
+      'Is anything meant to be enjoyed,': {mode:'list'},
+      'What is spirituality,': {mode:'scatter'},
+      'I wake and create what I can.': {mode:'resolve', col:'R', haze:'red'},
+      'I have to feed this body.': {mode:'seq'},
+      'The purpose I feel is somehow': {mode:'list'},
+      'I see balance.': {mode:'seq'},
+    },
+    marks: {'curse':'scrub','gift':'circle','jagged post':'underline','invisible concrete':'underline',
+      'frostier':'strike','conduit':'circle','The bottleneck is my will':'underline','factory':'x',
+      'production':'tangle','something more':'circle','Too divine':'circle','faithful belief':'underline',
+      'Because I must':'underline','feed this mission':'circle','painful and powerful':'underline',
+      'intoxicating':'coil','balance':'circle','be seen':'underline'}
+  }
+};
+
+/* ---------- 5x7 dot-matrix font ---------- */
+const F={
+' ':'..... ..... ..... ..... ..... ..... .....',
+'A':'.###. #...# #...# #...# ##### #...# #...#','B':'####. #...# #...# ####. #...# #...# ####.',
+'C':'.###. #...# #.... #.... #.... #...# .###.','D':'###.. #..#. #...# #...# #...# #..#. ###..',
+'E':'##### #.... #.... ####. #.... #.... #####','F':'##### #.... #.... ####. #.... #.... #....',
+'G':'.###. #...# #.... #.### #...# #...# .####','H':'#...# #...# #...# ##### #...# #...# #...#',
+'I':'.###. ..#.. ..#.. ..#.. ..#.. ..#.. .###.','J':'..### ...#. ...#. ...#. ...#. #..#. .##..',
+'K':'#...# #..#. #.#.. ##... #.#.. #..#. #...#','L':'#.... #.... #.... #.... #.... #.... #####',
+'M':'#...# ##.## #.#.# #.#.# #...# #...# #...#','N':'#...# #...# ##..# #.#.# #..## #...# #...#',
+'O':'.###. #...# #...# #...# #...# #...# .###.','P':'####. #...# #...# ####. #.... #.... #....',
+'Q':'.###. #...# #...# #...# #.#.# #..#. .##.#','R':'####. #...# #...# ####. #.#.. #..#. #...#',
+'S':'.#### #.... #.... .###. ....# ....# ####.','T':'##### ..#.. ..#.. ..#.. ..#.. ..#.. ..#..',
+'U':'#...# #...# #...# #...# #...# #...# .###.','V':'#...# #...# #...# #...# #...# .#.#. ..#..',
+'W':'#...# #...# #...# #.#.# #.#.# #.#.# .#.#.','X':'#...# #...# .#.#. ..#.. .#.#. #...# #...#',
+'Y':'#...# #...# .#.#. ..#.. ..#.. ..#.. ..#..','Z':'##### ....# ...#. ..#.. .#... #.... #####',
+'0':'.###. #...# #..## #.#.# ##..# #...# .###.','1':'..#.. .##.. ..#.. ..#.. ..#.. ..#.. .###.',
+'2':'.###. #...# ....# ...#. ..#.. .#... #####','3':'##### ...#. ..#.. ...#. ....# #...# .###.',
+'4':'...#. ..##. .#.#. #..#. ##### ...#. ...#.','5':'##### #.... ####. ....# ....# #...# .###.',
+'6':'..##. .#... #.... ####. #...# #...# .###.','7':'##### ....# ...#. ..#.. .#... .#... .#...',
+'8':'.###. #...# #...# .###. #...# #...# .###.','9':'.###. #...# #...# .#### ....# ...#. .##..',
+'.':'..... ..... ..... ..... ..... .##.. .##..',',':'..... ..... ..... ..... .##.. ..#.. .#...',
+"'":'..#.. ..#.. .#... ..... ..... ..... .....','"':'.#.#. .#.#. ..... ..... ..... ..... .....',
+'!':'..#.. ..#.. ..#.. ..#.. ..#.. ..... ..#..','?':'.###. #...# ....# ...#. ..#.. ..... ..#..',
+'-':'..... ..... ..... ##### ..... ..... .....','_':'..... ..... ..... ..... ..... ..... #####',
+':':'..... .##.. .##.. ..... .##.. .##.. .....',';':'..... .##.. .##.. ..... .##.. ..#.. .#...',
+'/':'..... ....# ...#. ..#.. .#... #.... .....','\\':'..... #.... .#... ..#.. ...#. ....# .....',
+'(':'...#. ..#.. .#... .#... .#... ..#.. ...#.',')':'.#... ..#.. ...#. ...#. ...#. ..#.. .#...',
+'[':'.###. .#... .#... .#... .#... .#... .###.',']':'.###. ...#. ...#. ...#. ...#. ...#. .###.',
+'<':'...#. ..#.. .#... #.... .#... ..#.. ...#.','>':'.#... ..#.. ...#. ....# ...#. ..#.. .#...',
+'=':'..... ..... ##### ..... ##### ..... .....','+':'..... ..#.. ..#.. ##### ..#.. ..#.. .....',
+'*':'..... ..#.. #.#.# .###. #.#.# ..#.. .....','#':'.#.#. .#.#. ##### .#.#. ##### .#.#. .#.#.',
+'$':'..#.. .#### #.#.. .###. ..#.# ####. ..#..','%':'##... ##..# ...#. ..#.. .#... #..## ...##',
+'&':'.##.. #..#. #.#.. .#... #.#.# #..#. .##.#','@':'.###. #...# ....# .##.# #.#.# #.#.# .###.',
+'£':'..##. .#..# .#... ###.. .#... .#... #####','¥':'#...# .#.#. ##### ..#.. ##### ..#.. ..#..',
+'|':'..#.. ..#.. ..#.. ..#.. ..#.. ..#.. ..#..','^':'..#.. .#.#. #...# ..... ..... ..... .....',
+'~':'..... ..... .#... #.#.# ...#. ..... .....','█':'##### ##### ##### ##### ##### ##### #####'
+};
+const GCH=Object.keys(F), GI={}; GCH.forEach((c,i)=>GI[c]=i);
+const NOISE='#%&$£@!?<>/\\[]()*+=-_:;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ¥|^~';
+const COLORS={W:'#e8e8e8',G:'#e8e8e8',A:'#cfcfcf',R:'#ffffff',B:'#ffffff',P:'#a8a8a8',D:'#6a6a6a'};
+const ATLAS={};
+for(const [k,v] of Object.entries(COLORS)){
+  const c=document.createElement('canvas'); c.width=GCH.length*5; c.height=7;
+  const x=c.getContext('2d'); x.fillStyle=v;
+  GCH.forEach((ch,i)=>F[ch].split(' ').forEach((row,y)=>{for(let p=0;p<5;p++) if(row[p]==='#') x.fillRect(i*5+p,y,1,1)}));
+  ATLAS[k]=c;
+}
+const LH=10; // line height in LEDs per scale unit
+
+/* ---------- utils ---------- */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function hash(a,b=0,c=0){let h=Math.imul(a|0,374761393)+Math.imul(b|0,668265263)+Math.imul(c|0,1442695041);
+  h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967296}
+const noiseCh=(s,t)=>NOISE[Math.floor(hash(s,t,13)*NOISE.length)];
+const rint=n=>Math.floor(Math.random()*n);
+function norm(s){return s.toUpperCase().replace(/[’‘`]/g,"'").replace(/[“”]/g,'"').replace(/[—–]/g,'-').replace(/…/g,'...')
+  .split('').map(c=>GI[c]!==undefined?c:' ').join('')}
+function wrap(str,max){const out=[];let cur='';
+  for(let w of str.split(' ')){ if(!w) continue;
+    while(w.length>max){ if(cur){out.push(cur);cur=''} out.push(w.slice(0,max)); w=w.slice(max) }
+    if(!cur) cur=w; else if(cur.length+1+w.length<=max) cur+=' '+w; else {out.push(cur);cur=w} }
+  if(cur) out.push(cur); return out}
+const words=lines=>lines.join(' ').split(/\s+/).filter(Boolean).length;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- canvases ---------- */
+const DPR=Math.min(2,window.devicePixelRatio||1);
+const wall=document.getElementById('wall'), grid=document.getElementById('grid');
+const m=wall.getContext('2d');
+const buf=document.createElement('canvas'), b=buf.getContext('2d');
+const gl=document.createElement('canvas'), g=gl.getContext('2d');
+const down=[0,1,2,3].map(()=>document.createElement('canvas'));
+let P,C,R,TOP,BOT,MARG,dotPat,lastW=0,lastH=0;
+
+function layout(){
+  const w=innerWidth,h=innerHeight; lastW=w; lastH=h;
+  const pc=clamp(w/400,3,4.5);
+  P=Math.max(3,Math.round(pc*DPR)); C=Math.floor(w*DPR/P); R=Math.floor(h*DPR/P);
+  const W=C*P,H=R*P, cw=W/DPR, ch=H/DPR, ox=(w-cw)/2, oy=(h-ch)/2;
+  for(const c of [wall,grid]){c.width=W;c.height=H;Object.assign(c.style,{width:cw+'px',height:ch+'px',left:ox+'px',top:oy+'px'})}
+  buf.width=C;buf.height=R;gl.width=C;gl.height=R;
+  let dw=C,dh=R; down.forEach(d=>{dw=Math.max(1,Math.ceil(dw/2));dh=Math.max(1,Math.ceil(dh/2));d.width=dw;d.height=dh});
+  // LED dot
+  const dc=document.createElement('canvas'); dc.width=dc.height=P; const dx=dc.getContext('2d');
+  dx.fillStyle='#fff'; dx.beginPath(); dx.arc(P/2,P/2,P*0.38,0,Math.PI*2); dx.fill();
+  dotPat=m.createPattern(dc,'repeat');
+  // unlit LEDs + cabinet seams
+  const gx=grid.getContext('2d'); gx.clearRect(0,0,W,H);
+  gx.globalAlpha=0.06; gx.fillStyle=gx.createPattern(dc,'repeat'); gx.fillRect(0,0,W,H);
+  gx.globalAlpha=1; gx.fillStyle='rgba(0,0,0,.9)';
+  const cab=C>200?48:32;
+  for(let x=cab;x<C;x+=cab) gx.fillRect(x*P-1,0,2,H);
+  for(let y=cab;y<R;y+=cab) gx.fillRect(0,y*P-1,W,2);
+  // safe rows below/above the HUD
+  const tp=document.getElementById('hudTop').getBoundingClientRect().bottom+10;
+  const bp=document.getElementById('hudBot').getBoundingClientRect().top-10;
+  TOP=Math.ceil((tp-oy)*DPR/P); BOT=Math.floor((bp-oy)*DPR/P);
+  MARG=Math.max(4,Math.round(C*0.05));
+}
+
+function glyph(ctx,ch,x,y,s,col,a){const i=GI[ch]; if(i===undefined||ch===' '||a<=0) return;
+  ctx.globalAlpha=Math.min(1,a); ctx.drawImage(ATLAS[col],i*5,0,5,7,x,y,5*s,7*s)}
+const maxChars=s=>Math.floor((C-2*MARG+s)/(6*s));
+
+/* ---------- clock ---------- */
+let now=0, paused=false; const waiters=[]; const CANCEL={};
+function sleep(k,sec){return new Promise(res=>waiters.push({t:now+sec,res,k})).then(()=>{if(k.dead) throw CANCEL})}
+function tickWaiters(){for(let i=waiters.length-1;i>=0;i--){const w=waiters[i]; if(w.k.dead||now>=w.t){waiters.splice(i,1);w.res()}}}
+
+/* ---------- elements ---------- */
+let E=[];
+class El{constructor(k,delay){this.k=k;this.t0=now+(delay||0);this.inEnd=0;this.hold=0;this.outDur=0.6}
+  get end(){return this.inEnd+this.hold+this.outDur+0.3}}
+
+class Txt extends El{
+  constructor(k,o){super(k,o.delay);
+    Object.assign(this,{s:1,col:'W',a:1,mode:'scramble',rate:0.03,cursor:false,cursorAfter:false,outDur:0.6},o);
+    this.str=norm(o.text); const n=this.str.length, inDur=o.inDur??0.9;
+    this.app=new Float32Array(n); this.rin=new Float32Array(n); this.rout=new Float32Array(n); this.seed=rint(1e9);
+    for(let i=0;i<n;i++){
+      if(this.mode==='type'){this.app[i]=this.rin[i]=i*this.rate}
+      else if(RM){this.app[i]=this.rin[i]=0}
+      else {this.app[i]=(i/Math.max(1,n))*inDur*0.35+Math.random()*0.1; this.rin[i]=this.app[i]+0.12+Math.random()*inDur*0.65}
+      this.rout[i]=RM?0:Math.random()*this.outDur*0.75;
+    }
+    let mx=0; for(let i=0;i<n;i++) mx=Math.max(mx,this.rin[i]);
+    this.inEnd=mx+(this.mode==='type'?this.rate:0); this.hold=o.hold??1.5;
+  }
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const outT=t-(this.inEnd+this.hold), s=this.s, str=this.str, tick=Math.floor(now*15);
+    let shown=-1;
+    for(let i=0;i<str.length;i++){ if(t<this.app[i]) continue; shown=i; const ch=str[i]; if(ch===' ') continue;
+      let c=ch,a=this.a;
+      if(t<this.rin[i]){c=noiseCh(this.seed+i,tick);a*=0.5}
+      if(outT>0){ if(RM){a*=Math.max(0,1-outT/0.4)} else {const d=outT-this.rout[i]; if(d>0.22) continue; if(d>0){c=noiseCh(this.seed+i*7,tick);a*=0.45}} }
+      glyph(ctx,c,this.x+i*6*s,this.y,s,this.col,a) }
+    if(this.cursor&&outT<0){ const typing=t<this.inEnd;
+      if(typing||(this.cursorAfter&&Math.floor(t*2.4)%2===0)) glyph(ctx,'█',this.x+(shown+1)*6*s,this.y,s,this.col,this.a*0.9) }
+    return true}
+}
+
+class Num extends El{
+  constructor(k,o){super(k,o.delay); Object.assign(this,{s:1,col:'A',a:1,dur:0.8,outDur:0.5,w:4},o);
+    this.inEnd=this.dur; this.hold=o.hold??1; this.seed=rint(1e9)}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const p=Math.min(1,t/this.dur), v=Math.round(this.from+(this.to-this.from)*(1-Math.pow(1-p,3)));
+    const str=String(v).padStart(this.w,'0'), outT=t-(this.inEnd+this.hold), s=this.s, tick=Math.floor(now*15);
+    const x0=this.xr-(str.length*6-1)*s;
+    for(let i=0;i<str.length;i++){let c=str[i],a=this.a;
+      if(p<1&&hash(this.seed,i,tick)<0.25){c=noiseCh(this.seed+i,tick);a*=0.6}
+      if(outT>0){const d=outT-hash(this.seed,i,3)*this.outDur*0.7; if(d>0.2) continue; if(d>0){c=noiseCh(this.seed+i,tick);a*=0.45}}
+      glyph(ctx,c,x0+i*6*s,this.y,s,this.col,a)}
+    return true}
+}
+
+class Blocks extends El{
+  constructor(k,o){super(k,o.delay); this.pts=o.pts; this.s=o.s||2; this.inEnd=0.01; this.hold=3; this.outDur=0.3; this.seed=rint(1e9)}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false; const outT=t-(this.inEnd+this.hold);
+    this.pts.forEach((p,i)=>{ if(hash(this.seed,i,Math.floor(now*2.2))<0.22) return; if(outT>hash(this.seed,i,9)*0.3) return;
+      glyph(ctx,'█',p[0],p[1],this.s,'R',0.95)}); return true}
+}
+
+class Field extends El{ // flickering fragments behind the scatter scenes
+  constructor(k,o){super(k,o.delay); Object.assign(this,o); this.inEnd=0.6; this.outDur=0.8; this.frags=[];
+    this.occ=Array.from({length:this.rows},()=>new Uint8Array(this.cols+2))}
+  free(f){for(let i=0;i<f.str.length;i++) this.occ[f.gy][f.gx+i]=0}
+  spawn(){const gy=rint(this.rows); if(this.reserved.has(gy)) return; const len=2+rint(9); const gx=rint(this.cols-len+1); if(gx<0) return;
+    const row=this.occ[gy]; for(let i=Math.max(0,gx-1);i<=Math.min(this.cols,gx+len);i++) if(row[i]) return;
+    let str='';
+    if(Math.random()<0.5&&this.words.length){const w=this.words[rint(this.words.length)]; str=w.split('').map(c=>Math.random()<0.3?NOISE[rint(NOISE.length)]:c).join('').slice(0,len)}
+    else for(let i=0;i<len;i++) str+=NOISE[rint(NOISE.length)];
+    const f={gx,gy,str,born:now,life:0.15+Math.random()*1.5,a:0.22+Math.random()*0.38,seed:rint(1e9)};
+    for(let i=0;i<str.length;i++) row[gx+i]=1; this.frags.push(f)}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const outT=t-(this.inEnd+this.hold); let env=Math.min(1,t/0.6); if(outT>0) env=Math.max(0,1-outT/this.outDur);
+    this.frags=this.frags.filter(f=>{if(now>f.born+f.life){this.free(f);return false}return true});
+    const target=Math.floor(this.cols*this.rows*this.density*env/6); let tries=0;
+    while(this.frags.length<target&&tries++<30) this.spawn();
+    const tick=Math.floor(now*14), s=this.s;
+    for(const f of this.frags) for(let i=0;i<f.str.length;i++){let c=f.str[i]; if(c===' ') continue;
+      if(hash(f.seed,i,tick)<0.14) c=noiseCh(f.seed+i,tick);
+      glyph(ctx,c,this.x0+(f.gx+i)*6*s,this.y0+f.gy*LH*s,s,this.col,f.a*env)}
+    return true}
+}
+
+function tailFor(kind,a,c,pid){const h=hash(a,c,911);
+  switch(kind){case 'usd':return '$----'+(1000+Math.floor(h*9000))+'0000';
+    case 'psi':return (2000+Math.floor(h*6000))+'PSI';
+    case 'units':return String(1e6+Math.floor(h*9e6))+'U';
+    default:return pid+'.'+String(Math.floor(h*999)).padStart(3,'0')}}
+
+class Wall extends El{ // repeated-phrase data wall
+  constructor(k,o){super(k,0); this.phrase=norm(o.phrase); this.kind=o.tail; this.pid=o.pid;
+    this.inEnd=1.4; this.hold=o.hold??4.4; this.outDur=1.3;
+    const mc=maxChars(1); this.n=mc>=64?2:1; this.cw=this.n===2?Math.floor((mc-3)/2):mc;
+    this.rowsN=Math.ceil((BOT-TOP)/LH)+1; this.cache=new Map(); this.anom=[rint(this.rowsN),rint(this.n)]; this.speed=RM?0:5}
+  cell(a,c){const key=a*8+c; let s=this.cache.get(key); if(s) return s;
+    const tail=tailFor(this.kind,a,c,this.pid), dashes=this.cw-this.phrase.length-tail.length;
+    if(dashes<2){ // narrow wall: the phrase reads downward, one chunk per row
+      const ch=this.chunks||(this.chunks=wrap(this.phrase,Math.max(6,this.cw-7)));
+      const part=ch[((a%ch.length)+ch.length)%ch.length], tl=tail.replace(/[^0-9]/g,'').slice(0,4);
+      s=(part+'-'.repeat(Math.max(2,this.cw-part.length-tl.length))+tl).slice(0,this.cw);
+    } else {
+      s=this.phrase+'-'.repeat(dashes)+tail;
+      if(hash(a,c,5)<0.4){const cut=1+Math.floor(hash(a,c,6)*6); s=' '.repeat(cut)+s.slice(cut)}
+    }
+    this.cache.set(key,s); return s}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const outT=t-(this.inEnd+this.hold), scroll=t*this.speed, base=Math.floor(scroll/LH), off=scroll%LH, tick=Math.floor(now*12);
+    ctx.save(); ctx.beginPath(); ctx.rect(0,TOP,C,BOT-TOP); ctx.clip();
+    for(let r=0;r<=this.rowsN;r++){const a=r+base, y=Math.round(TOP+r*LH-off);
+      for(let c=0;c<this.n;c++){
+        if(t<(r/this.rowsN)*0.9+hash(a,c,1)*0.4) continue;
+        if(outT>0&&outT>hash(a,c,2)*this.outDur*0.85) continue;
+        const str=this.cell(a,c), x=MARG+c*(this.cw+3)*6, an=(a%this.rowsN===this.anom[0]&&c===this.anom[1]);
+        const col=an?'R':'P', al=an?(hash(a,tick,3)>0.3?1:0.25):0.8;
+        for(let i=0;i<str.length;i++){let ch=str[i]; if(ch===' ') continue; if(hash(a*31+c,i,tick)<0.004) ch=noiseCh(a+i,tick);
+          glyph(ctx,ch,x+i*6,y,1,col,al)}}}
+    ctx.restore(); return true}
+}
+
+class Bars extends El{ // striped title card + bar field
+  constructor(k,o){super(k,0); this.inEnd=1.1; this.hold=o.hold??2.6; this.outDur=0.9; this.col=o.col||'B'; this.seed=rint(1e9);
+    const title=norm(o.title), longest=Math.max(...title.split(' ').map(w=>w.length));
+    const aw=C-2*MARG, ah=(BOT-TOP)*0.5; let best=null;
+    for(let mc=longest;mc<=title.length;mc++){const lines=wrap(title,mc), wch=Math.max(...lines.map(l=>l.length));
+      const s=Math.min(Math.floor((aw+1)/(wch*6)),Math.floor(ah/(lines.length*8))); if(!best||s>best.s) best={s,lines}}
+    this.s=Math.max(1,best.s); this.lines=best.lines; const s=this.s;
+    this.th=this.lines.length*8*s-s; this.x0=MARG; this.y0=TOP+Math.round((BOT-TOP-this.th)/2)-(o.sub?LH:0);
+    this.lit=Math.max(1,Math.round(s*0.6));
+    this.sub=o.sub?new Txt(k,{text:o.sub,x:MARG,y:this.y0+this.th+Math.max(6,2*s)+2,mode:'type',rate:0.018,delay:0.8,col:this.col,a:0.75,hold:0}):null;
+    if(this.sub) this.sub.hold=Math.max(0,(this.inEnd+this.hold)-(0.8+this.sub.inEnd));
+  }
+  seg(ctx,x0,x1,y,j,t,outT){ // draw a bar from x0..x1 respecting wipe in/out
+    const rx=RM?C:(t-j*0.018)/0.55*C; let a=Math.max(x0,0), z=Math.min(x1,rx);
+    if(outT>0){const ex=RM?(outT/0.6)*C*2:(outT-j*0.012)/0.5*C; a=Math.max(a,ex)}
+    if(z>a) ctx.fillRect(a,y,z-a,this.lit)}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const outT=t-(this.inEnd+this.hold), s=this.s; ctx.globalAlpha=1; ctx.fillStyle=COLORS[this.col];
+    const end=C-MARG;
+    this.seg(ctx,this.x0,end,this.y0-3*s,-2,t,outT); // top bar
+    this.lines.forEach((line,li)=>{
+      for(let py=0;py<7;py++){const y=this.y0+(li*8+py)*s, j=li*8+py;
+        for(let ci=0;ci<line.length;ci++){const row=F[line[ci]].split(' ')[py];
+          for(let px=0;px<5;px++) if(row[px]==='#'){const X=this.x0+(ci*6+px)*s; this.seg(ctx,X,X+s,y,j,t,outT)}}
+        // bar field to the right of this line
+        let x=this.x0+line.length*6*s+s*2, q=0, ph=Math.floor(t*0.8);
+        while(x<end){const full=hash(this.seed+j,q,ph)<0.72; const len=full?end-x:Math.max(2*s,Math.floor(hash(this.seed+j,q,ph+7)*(end-x)*0.5));
+          this.seg(ctx,x,Math.min(end,x+len),y,j,t,outT); x+=len+2*s; q++}
+      }});
+    return true}
+}
+
+/* ---------- journal marks: bitmap strokes drawn on the grid ---------- */
+function line(x0,y0,x1,y1,plot){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1; let e=dx+dy;
+  for(;;){plot(x0,y0); if(x0===x1&&y0===y1) break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx} if(e2<=dx){e+=dx;y0+=sy}}}
+const BRUSH={};
+function brush(th){if(BRUSH[th]) return BRUSH[th]; const o=[];
+  if(th<=2){for(let a=0;a<th;a++) for(let c=0;c<th;c++) o.push([a,c])}
+  else {const r=th/2; for(let a=-Math.ceil(r);a<=Math.ceil(r);a++) for(let c=-Math.ceil(r);c<=Math.ceil(r);c++) if(a*a+c*c<=r*r+0.3) o.push([a,c])}
+  return BRUSH[th]=o}
+function raster(polys,th){const out=[], seen=new Set(), B=brush(th);
+  const plot=(x,y)=>{for(const [a,c] of B){const X=x+a,Y=y+c; if(X<0||Y<0||X>=C||Y>=R) continue;
+    const key=Y*C+X; if(seen.has(key)) continue; seen.add(key); out.push(X,Y)}};
+  for(const pl of polys) for(let i=0;i<pl.length-1;i++) line(pl[i][0],pl[i][1],pl[i+1][0],pl[i+1][1],plot);
+  return out}
+const J=()=>Math.random()*2-1;
+function shapeFor(kind,{x0,x1,yt,yb,s}){const w=x1-x0,h=yb-yt,L=[];
+  switch(kind){
+    case 'underline':{const y=yb+2*s+rint(2), a=x0-rint(3)*s, z=x1+(1+rint(4))*s, tilt=J()*1.5*s;
+      L.push([[a,y],[(a+z)/2,y+J()*0.7*s+tilt/2],[z,y+tilt]]);
+      if(Math.random()<0.3){const y2=y+2*s+1; L.push([[a+rint(4)*s,y2+J()],[z-rint(3)*s,y2+tilt+J()]])} break}
+    case 'strike':{const y=yt+h*0.5, n=Math.random()<0.4?2:1;
+      for(let j=0;j<n;j++) L.push([[x0-2*s-rint(3),y+J()*1.6*s],[x1+2*s+rint(3),y+J()*1.6*s]]); break}
+    case 'x':L.push([[x0-s,yt-s],[x1+s,yb+s]]); L.push([[x1+s,yt-s+J()*s],[x0-s,yb+s]]); break;
+    case 'scratch':{const st=Math.max(3,Math.round(3*s)), pts=[]; let x=x0-s, up=true;
+      while(x<=x1+s){pts.push([x,up?yt-s+J():yb+s+J()]); x+=st; up=!up}
+      x=x1+s; up=false; while(x>=x0-s){pts.push([x+J()*s,up?yt+J():yb+J()]); x-=st*1.3; up=!up}
+      L.push(pts); break}
+    default:{const cx=(x0+x1)/2, cy=(yt+yb)/2, rx=w/2+3*s+rint(3), ry=h/2+3*s+rint(2);
+      const a0=Math.random()*Math.PI*2, span=Math.PI*2*(1.08+Math.random()*0.16), ph=Math.random()*6, tl=J()*0.08;
+      const N=Math.max(24,Math.round((rx+ry)*0.6)), pts=[];
+      for(let i=0;i<=N;i++){const a=a0+span*i/N, wb=1+0.07*Math.sin(3*a+ph)+0.05*(i/N), ex=Math.cos(a)*rx*wb, ey=Math.sin(a)*ry*wb;
+        pts.push([cx+ex*Math.cos(tl)-ey*Math.sin(tl),cy+ex*Math.sin(tl)+ey*Math.cos(tl)])}
+      L.push(pts)}}
+  return L}
+/* gestural scribbles (after the journal pages): tangles, marker scrubs, coils, hatching, heavy X */
+const THICK=()=>C>250?4:3;
+function tangle(cx,cy,rx,ry,loops){const N=Math.round(40*loops), f2=2+Math.random()*2.2, f3=0.3+Math.random()*0.4;
+  const p0=Math.random()*6,p1=Math.random()*6,p2=Math.random()*6, pts=[];
+  for(let i=0;i<=N;i++){const t=i/N*loops*Math.PI*2;
+    const dx=Math.cos(t+p0)*0.65+Math.cos(f2*t+p1)*0.25+Math.sin(f3*t+p2)*0.25;
+    const dy=Math.sin(t*1.07+p0)*0.65+Math.sin(f2*t*0.9+p1)*0.25+Math.cos(f3*t*1.3+p2)*0.25;
+    const g=0.55+0.45*Math.abs(Math.sin(f3*t*0.7+p1)); pts.push([cx+dx*rx*g,cy+dy*ry*g])}
+  return pts}
+function coil(x0,x1,cy,r){const pitch=Math.max(2,r*1.1), turns=Math.max(2,(x1-x0)/pitch), N=Math.round(turns*18), pts=[];
+  for(let i=0;i<=N;i++){const t=i/N*turns*2*Math.PI;
+    pts.push([x0+t/(2*Math.PI)*pitch+Math.cos(t+Math.PI)*r*0.8+Math.sin(t)*r*0.35, cy+Math.sin(t)*r*(0.9+0.2*Math.sin(t*0.3))])}
+  return pts}
+function scrub(x0,x1,yt,yb,step){const pts=[]; let i=0;
+  for(let y=yt;y<=yb;y+=step,i++) pts.push([(i%2?x1:x0)+J()*3, y+J()]);
+  return pts}
+function hatch(x0,x1,yt,yb,step){const sl=(yb-yt)*0.6, pts=[]; let up=true;
+  for(let x=x0;x<=x1;x+=step){pts.push(up?[x,yb+J()]:[x+sl,yt+J()]); up=!up}
+  return pts}
+function gesture(kind,x0,yt,x1,yb){ // returns {polys,th,col}
+  const w=x1-x0, h=yb-yt, cx=(x0+x1)/2, cy=(yt+yb)/2, T=THICK();
+  switch(kind){
+    case 'tangle':{const ry=Math.max(h/2,Math.min(w/2,24)*0.55), rx=Math.min(w/2,ry*2.2); return {polys:[tangle(cx,cy,rx,ry,3+Math.random()*4)],th:1,col:Math.random()<0.25?'D':'R'}}
+    case 'scrub':return {polys:[scrub(x0,x1,yt,yb,Math.max(2,T-1))],th:T,col:Math.random()<0.7?'D':'R'};
+    case 'coil':return {polys:[coil(x0,x1,cy,Math.max(3,h/2))],th:Math.random()<0.3?2:1,col:Math.random()<0.5?'D':'R'};
+    case 'hatch':return {polys:[hatch(x0,x1-h*0.6,yt,yb,Math.max(3,T+1))],th:2,col:'D'};
+    default:{const bend=J()*h*0.3; // heavy gestural X
+      return {polys:[[[x0,yb],[cx+bend,cy],[x1,yt+J()*3]],[[x0+J()*3,yt],[cx-bend,cy+J()*2],[x1,yb]]],th:T,col:Math.random()<0.6?'D':'R'}}}
+}
+const GESTURES=['tangle','scrub','coil','hatch','bigx'];
+
+class Mark extends El{
+  constructor(k,o){super(k,o.delay); this.pts=o.pts; this.n=o.pts.length/2; this.inEnd=RM?0.01:o.dur; this.hold=o.hold; this.outDur=0.3;
+    this.th=o.th; this.col='W'; this.rnd=Float32Array.from({length:this.n},()=>Math.random())}
+  draw(ctx){const t=now-this.t0; if(t<0) return true; if(t>this.end) return false;
+    const outT=t-(this.inEnd+this.hold), p=Math.min(1,t/this.inEnd), shown=Math.floor(this.n*p);
+    ctx.globalAlpha=1; ctx.fillStyle=COLORS[this.col];
+    for(let i=0;i<shown;i++){if(outT>0&&outT>this.rnd[i]*this.outDur*0.8) continue; ctx.fillRect(this.pts[2*i],this.pts[2*i+1],1,1)}
+    if(p<1&&shown>0&&Math.floor(now*24)%2===0){const i=shown-1; ctx.fillStyle=COLORS.W; ctx.fillRect(this.pts[2*i]-1,this.pts[2*i+1]-1,this.th+2,this.th+2)}
+    return true}
+}
+const STOP=new Set(['THERE','WHERE','ABOUT','THEIR','OTHER','WHICH','WOULD','COULD','SHOULD','BEING','THESE','THOSE',"AREN'T","I'VE","I'LL","IT'S","DON'T","I'M","THAT'S","WE'D","WE'VE","WE'RE","THEY'VE"]);
+const KINDS=[['underline',0.24],['circle',0.18],['strike',0.12],['scratch',0.08],['x',0.04],['tangle',0.13],['scrub',0.11],['coil',0.06],['hatch',0.04]];
+const pickKind=()=>{let r=Math.random(); for(const [k,w] of KINDS){if((r-=w)<0) return k} return 'underline'};
+const reEsc=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+let curPid=null, usedMarks=new Set();
+let markBusy=0; // only one mark on screen at a time
+function markBox(e,i0,len){const s=e.s; return {x0:e.x+i0*6*s, x1:e.x+(i0+len)*6*s-s-1, yt:e.y, yb:e.y+7*s-1, s}}
+function markPts(kind,box){const s=box.s; let polys, th=Math.max(1,Math.floor(s/2));
+  if(['tangle','scrub','coil','hatch','bigx'].includes(kind)){const g=gesture(kind,box.x0-2*s,box.yt-s,box.x1+2*s,box.yb+s); polys=g.polys; th=Math.max(th,kind==='scrub'||kind==='bigx'?Math.min(g.th,s+2):g.th)}
+  else polys=shapeFor(kind,box);
+  const pts=raster(polys,th); return {pts,th,dur:clamp(0.25+pts.length/2*0.0022/th,0.3,1.1)}}
+function markup(k,els,o={}){
+  if(o.nomark||Math.random()>=0.5) return; const lines=els.filter(e=>e.pl&&e.str.trim()); if(!lines.length) return;
+  const dir=(DIRECTION[curPid]||{}).marks||{}; let h=null;
+  for(const e of lines){ for(const [ph,kind] of Object.entries(dir)){ if(usedMarks.has(ph)) continue;
+    const P=norm(ph), m=new RegExp("(^|[^A-Z'])("+reEsc(P)+")(?=$|[^A-Z'])").exec(e.str);
+    if(m){h={e,i0:m.index+m[1].length,len:P.length,kind,ph}; break}} if(h) break}
+  if(!h){const cand=[];
+    for(const e of lines){const re=/[A-Z']+/g; let m; while((m=re.exec(e.str))){const w=m[0]; if(w.length<5||STOP.has(w)) continue; cand.push({e,i0:m.index,len:w.length,kind:pickKind()})}}
+    if(!cand.length) return; h=cand[rint(cand.length)]}
+  const e=h.e, exitAt=e.t0+e.inEnd+e.hold;
+  let startAt=Math.max(markBusy, e.t0+e.inEnd+0.25+Math.random()*0.9); if(exitAt-startAt<0.8) startAt=Math.max(markBusy,e.t0+e.inEnd,exitAt-0.8);
+  if(exitAt-startAt<0.45) return;
+  if(h.ph) usedMarks.add(h.ph);
+  const {pts,th,dur:d0}=markPts(h.kind,markBox(e,h.i0,h.len)), dur=Math.min(d0,(exitAt-startAt)*0.6);
+  els.push(new Mark(k,{delay:startAt-now,pts,dur,hold:exitAt-startAt-dur,th})); markBusy=exitAt+0.7;
+}
+async function sScribble(k,words){ // a journal page: words stacked down the screen, marked one at a time
+  const els=[], top=TOP+2, bot=BOT-2, list=words.slice(0,Math.max(3,Math.floor(H()/(LH*2.4))));
+  const slot=(bot-top)/list.length, txt=[];
+  list.forEach((wd,i)=>{const str=norm(wd), s=(maxChars(2)>=str.length+1&&Math.random()<0.3)?2:1, w=str.length*6*s-s;
+    const x=MARG+rint(Math.max(1,C-2*MARG-w)), y=Math.round(top+slot*i+Math.max(0,(slot-7*s))*Math.random());
+    const e=new Txt(k,{text:str,x,y,s,delay:i*0.18,inDur:0.5,col:'W'}); els.push(e); txt.push(e)});
+  const order=txt.map((_,i)=>i).sort(()=>Math.random()-0.5).slice(0,Math.max(1,Math.round(txt.length/4)));
+  let t=Math.max(markBusy-now,list.length*0.18+0.9);
+  for(const i of order){const e=txt[i], {pts,th,dur}=markPts(pickKind(),markBox(e,0,e.str.length)), hold=0.9;
+    els.push(new Mark(k,{delay:t,pts,dur,hold,th})); t+=dur+hold+0.75}
+  const T=t+0.6; txt.forEach(e=>e.hold=Math.max(0,T-(e.t0-now)-e.inEnd)); markBusy=now+t;
+  add(els); await sleep(k,sceneEnd(els));
+}
+
+function ambient(ctx){const n=Math.floor(C*R*0.00025), tick=Math.floor(now*8); ctx.fillStyle=COLORS.W;
+  for(let i=0;i<n;i++){ctx.globalAlpha=0.06+hash(i,tick,77)*0.16; ctx.fillRect(Math.floor(hash(i,tick,3)*C),Math.floor(hash(i,tick,5)*R),1,1)}}
+
+let gNext=6,gUntil=0,gBands=[];
+function glitch(){ if(RM) return;
+  if(now>gNext){gUntil=now+0.05+Math.random()*0.16; gNext=now+4+Math.random()*9;
+    gBands=Array.from({length:1+rint(3)},()=>({y:rint(R),h:2+rint(18),dx:(Math.random()<.5?-1:1)*(2+rint(14))}))}
+  if(now<gUntil){g.clearRect(0,0,C,R); g.drawImage(buf,0,0); b.globalAlpha=1;
+    for(const q of gBands){b.clearRect(0,q.y,C,q.h); b.drawImage(gl,0,q.y,C,q.h,q.dx,q.y,C,q.h)}}}
+
+function composite(){const W=C*P,H=R*P;
+  m.globalCompositeOperation='source-over'; m.globalAlpha=1; m.clearRect(0,0,W,H);
+  m.imageSmoothingEnabled=false; m.drawImage(buf,0,0,W,H);
+  m.globalCompositeOperation='destination-in'; m.fillStyle=dotPat; m.fillRect(0,0,W,H);
+  m.globalCompositeOperation='source-over'; m.globalAlpha=1}
+
+/* ---------- haze ---------- */
+function haze(){} // monochrome build: no atmosphere layers
+
+/* ---------- scenes ---------- */
+const add=els=>{for(const e of els) E.push(e)};
+function syncExit(els,hold){const T=Math.max(...els.map(e=>e.t0+e.inEnd))+hold; els.forEach(e=>e.hold=Math.max(0,T-(e.t0+e.inEnd)))}
+const sceneEnd=els=>Math.max(...els.map(e=>e.t0+e.end))-now;
+const readHold=txt=>clamp(1.6+txt.length*0.045,2.4,8);
+const H=()=>BOT-TOP;
+
+async function sResolve(k,lines,o={}){
+  const L=lines.map(norm), all=L.join(' ');
+  const longest=Math.max(...all.split(' ').map(w=>w.length));
+  let s=o.maxS||((L.length===1&&L[0].length<=13)?4:3), rows;
+  for(;s>=1;s--){const mc=maxChars(s); if(longest>mc&&s>1) continue;
+    rows=L.flatMap(l=>wrap(l,mc)); if(rows.length*LH*s<=H()*0.8||s===1) break}
+  const h=rows.length*LH*s-3*s, y0=TOP+Math.round((H()-h)/2);
+  const left=o.align==='left', inDur=o.inDur??clamp(0.5+all.length*0.012,0.7,1.4);
+  const els=rows.map((r,i)=>{const w=r.length*6*s-s;
+    return new Txt(k,{text:r,x:left?MARG:Math.round((C-w)/2),y:y0+i*LH*s,s,col:o.col||'W',delay:i*0.12,inDur,outDur:0.6,pl:true})});
+  syncExit(els,o.hold??readHold(all)); markup(k,els,o); add(els);
+  await sleep(k,Math.max(0.2,sceneEnd(els)-(o.overlap||0)));
+}
+async function sSeq(k,lines,o={}){
+  for(let i=0;i<lines.length;i++){const last=i===lines.length-1;
+    await sResolve(k,[lines[i]],{...o,hold:clamp(0.9+lines[i].length*0.05,1.3,3.6),overlap:last?0:0.35})}
+}
+const CODES=['( )','(O)','(O-)','(O--<','(OO)','(_)','(/)','(..)','[ ]','(=)','(O_O)','((Y))','(-)','(*)'];
+async function sList(k,lines,o={}){
+  const codes=o.codes!==false&&maxChars(1)>=40, cw=codes?6:0, mc=maxChars(1)-cw-1;
+  const rows=[]; lines.forEach(l=>wrap(norm(l),mc).forEach((r,j)=>rows.push({r,first:j===0})));
+  if(rows.length*LH>H()&&lines.length>1){const hh=Math.ceil(lines.length/2); await sList(k,lines.slice(0,hh),o); return sList(k,lines.slice(hh),o)}
+  const h=rows.length*LH, y0=TOP+Math.round((H()-h)*0.42), x0=MARG+cw*6, rate=o.rate||0.026;
+  let d=0; const els=[];
+  rows.forEach((row,i)=>{const y=y0+i*LH;
+    if(codes&&row.first) els.push(new Txt(k,{text:CODES[rint(CODES.length)],x:MARG,y,mode:'type',rate:0.02,delay:d,col:'W',a:0.8}));
+    els.push(new Txt(k,{text:row.r,x:x0,y,mode:'type',rate,delay:d,cursor:true,cursorAfter:i===rows.length-1,col:o.col||'G',pl:true}));
+    d+=row.r.length*rate+(row.first?0.2:0.08)});
+  if(codes&&C>220){const bx=C-MARG-24, by=y0+LH*Math.min(rows.length-1,2+rint(3));
+    els.push(new Blocks(k,{pts:[[bx,by],[bx,by+16],[bx-12,by+26]],delay:0.6}))}
+  syncExit(els,o.hold??readHold(lines.join(' '))); markup(k,els,o); add(els); await sleep(k,sceneEnd(els));
+}
+async function sTally(k,lines,o={}){
+  const numW=4; let s=2, mc=maxChars(2)-numW-2;
+  const fits2=lines.every(l=>norm(l).length<=mc)&&(lines.length+2)*LH*2<=H();
+  if(!fits2){s=1; mc=maxChars(1)-numW-2}
+  const rows=[]; lines.forEach((l,li)=>{const w=wrap(norm(l),mc); w.forEach((r,j)=>rows.push({r,li,last:j===w.length-1}))});
+  if((rows.length+2)*LH*s>H()&&lines.length>1){const hh=Math.ceil(lines.length/2);
+    await sTally(k,lines.slice(0,hh),o); return sTally(k,lines.slice(hh),{...o,cum:o.cum+words(lines.slice(0,hh))})}
+  const h=(rows.length+1.6)*LH*s, y0=TOP+Math.round((H()-h)/2)+LH*s*0.6, xr=C-MARG; let d=0, cum=o.cum||0; const els=[];
+  els.push(new Txt(k,{text:'WORDS',x:xr-(5*6-1)*s,y:y0-LH*s,s,mode:'type',rate:0.04,col:'A',a:0.5}));
+  rows.forEach((row,i)=>{const y=y0+i*LH*s;
+    els.push(new Txt(k,{text:row.r,x:MARG,y,s,delay:d,inDur:0.45,col:'A',pl:true}));
+    if(row.last){const wc=words([lines[row.li]]); els.push(new Num(k,{xr,y,s,from:cum,to:cum+wc,delay:d+0.2,w:numW})); cum+=wc}
+    d+=0.34});
+  const dn=Math.floor((C-2*MARG)/(6*s)/2);
+  els.push(new Txt(k,{text:'- '.repeat(dn),x:MARG,y:y0+rows.length*LH*s+2*s,s,mode:'type',rate:0.008,delay:d,col:'A',a:0.85}));
+  syncExit(els,o.hold??readHold(lines.join(' '))); markup(k,els,o); add(els); await sleep(k,sceneEnd(els));
+}
+async function sScatter(k,lines,o={}){
+  let s=maxChars(2)>=26?2:1, rows, G;
+  const build=()=>{const mc=maxChars(s); rows=[]; lines.forEach((l,li)=>wrap(norm(l),mc).forEach((r,j)=>rows.push({r,li,j}))); G=Math.floor(H()/(LH*s))};
+  build(); if(rows.length>G&&s===2){s=1;build()}
+  if(rows.length>G*0.55&&lines.length>1){const hh=Math.ceil(lines.length/2); await sScatter(k,lines.slice(0,hh),o); return sScatter(k,lines.slice(hh),o)}
+  const cols=maxChars(s), span=Math.min(G,rows.length*2+2), start=Math.floor((G-span)/2);
+  const pool=[]; for(let i=0;i<span;i++) pool.push(start+i);
+  while(pool.length>rows.length) pool.splice(rint(pool.length),1);
+  const reserved=new Set(pool), els=[], lineX={};
+  rows.forEach((row,i)=>{ if(row.j===0) lineX[row.li]=rint(Math.max(1,cols-row.r.length+1));
+    const gx=Math.min(lineX[row.li],cols-row.r.length);
+    els.push(new Txt(k,{text:row.r,x:MARG+gx*6*s,y:TOP+pool[i]*LH*s,s,delay:0.3+i*0.42,inDur:1.2,col:o.col||'W',pl:true}))});
+  const ws=[...new Set(POEMS.flatMap(p=>p.stanzas.flat()).join(' ').split(/\s+/).map(norm).filter(w=>w.length>3))];
+  els.push(new Field(k,{cols,rows:G,x0:MARG,y0:TOP,s,reserved,density:0.15,col:'W',words:ws}));
+  syncExit(els,o.hold??readHold(lines.join(' '))); markup(k,els,o); add(els); await sleep(k,sceneEnd(els));
+}
+async function sWall(k,cfg,pid){const w=new Wall(k,{...cfg,pid}); add([w]); await sleep(k,w.end)}
+async function sBars(k,title,sub){const bars=new Bars(k,{title,sub}); const els=[bars]; if(bars.sub) els.push(bars.sub); add(els); await sleep(k,sceneEnd(els))}
+
+/* ---------- director ---------- */
+const ROT=['list','scatter','tally','seq']; let rotI=0;
+function pickMode(st,prev){const n=st.length, avg=st.join(' ').length/n;
+  if(n<=2) return 'resolve';
+  for(let j=0;j<ROT.length;j++){const md=ROT[(rotI+j)%ROT.length]; if(md===prev) continue; if(md==='seq'&&(avg>22||n>7)) continue;
+    rotI=(rotI+j+1)%ROT.length; return md} return 'list'}
+const HAZE_FOR={resolve:'mono',seq:'mono',list:'rg',tally:'amber',scatter:'mono'};
+const LABEL={scribble:'Scribble',resolve:'Resolve',seq:'Sequence',list:'Log',tally:'Tally',scatter:'Field',wall:'Data wall',bars:'Title'};
+
+let tok={dead:true}, cur=0;
+async function boot(k){
+  setHud(null,0,'bars'); haze('blue');
+  await sBars(k,'NEW RUIN','ARCHIVE // JOURNAL POETRY');
+  haze('rg'); setHud(null,0,'list');
+  await sList(k,['> MOUNTING JOURNAL ARCHIVE','> '+POEMS.length+' ENTRIES FOUND','> '+POEMS.map(p=>p.id).join('  '),'> BEGIN TRANSMISSION'],{codes:false,hold:1.4,rate:0.022,nomark:true});
+  haze('dark'); await sleep(k,0.8);
+}
+async function playPoem(k,p){
+  const dir=DIRECTION[p.id]||{}; let prev=null, cum=0; rotI=0; curPid=p.id; usedMarks=new Set();
+  setHud(p,0,'bars'); haze('blue');
+  await sBars(k,p.title||p.code,p.title?`${p.code} // ${p.date}`:`JOURNAL POETRY // ${p.date}`);
+  haze('dark'); await sleep(k,0.5);
+  for(let si=0;si<p.stanzas.length;si++){const st=p.stanzas[si];
+    const ov=Object.entries(dir.modes||{}).find(([key])=>st[0].startsWith(key))?.[1]||{};
+    const mode=ov.mode||pickMode(st,prev);
+    setHud(p,si+1,mode); haze(ov.haze||HAZE_FOR[mode]); sr.textContent=st.join(' / ');
+    const o={col:ov.col};
+    if(mode==='resolve') await sResolve(k,st,o);
+    else if(mode==='seq') await sSeq(k,st,o);
+    else if(mode==='list') await sList(k,st,o);
+    else if(mode==='tally') await sTally(k,st,{...o,cum});
+    else await sScatter(k,st,o);
+    cum+=words(st); prev=mode;
+    const w=(dir.walls||[]).find(w=>st.some(l=>l.includes(w.after)));
+    if(w){await sleep(k,0.25); setHud(p,si+1,'wall'); haze('wall'); await sWall(k,w,p.id); prev='wall'}
+    if((si===Math.floor(p.stanzas.length/3)||si===Math.floor(p.stanzas.length*2/3))&&prev!=='wall'&&si<p.stanzas.length-1){
+      const pool=Object.keys(dir.marks||{}).filter(w=>w.length<=16);
+      await sleep(k,0.2); setHud(p,si+1,'scribble'); await sScribble(k,pool.sort(()=>Math.random()-0.5)); prev='scribble'}
+    await sleep(k,0.35);
+  }
+  haze('dark'); await sleep(k,1.4);
+}
+async function run(start,withBoot){
+  const k=tok={dead:false};
+  try{
+    if(withBoot) await boot(k);
+    for(let i=start;;i=(i+1)%POEMS.length){cur=i; setHash(i); await playPoem(k,POEMS[i]); if(i===POEMS.length-1) await boot(k)}
+  }catch(e){if(e!==CANCEL) console.error(e)}
+}
+function jump(i){tok.dead=true; markBusy=0; E=E.filter(e=>!e.k||!e.k.dead); haze('dark'); run((i+POEMS.length)%POEMS.length,false)}
+
+/* ---------- HUD ---------- */
+const $=id=>document.getElementById(id);
+const sr=$('sr'), hudCode=$('code'), hudMeta=$('meta'), hudMode=$('mode'), hudProg=$('prog'), tcEl=$('tc');
+let progFor=null;
+function setHud(p,si,mode){
+  if(!p){hudCode.textContent='NEW RUIN'; hudMeta.textContent=''; hudMode.textContent='Boot // '+LABEL[mode]; hudProg.innerHTML=''; progFor=null; return}
+  hudCode.textContent=p.title?`${p.code} — ${p.title}`:p.code;
+  hudMeta.textContent=si?`${String(si).padStart(2,'0')}/${String(p.stanzas.length).padStart(2,'0')}`:'';
+  hudMode.textContent=`Ch.${String(POEMS.indexOf(p)+1).padStart(2,'0')} // ${LABEL[mode]}`;
+  if(progFor!==p){hudProg.innerHTML=p.stanzas.map(()=>'<b></b>').join(''); progFor=p}
+  [...hudProg.children].forEach((el,i)=>{el.className=i+1<si?'on':i+1===si?'now':''});
+}
+function tc(){const f=Math.floor(now*24)%24, s=Math.floor(now)%60, mi=Math.floor(now/60)%60, h=Math.floor(now/3600);
+  return [h,mi,s,f].map(v=>String(v).padStart(2,'0')).join(':')}
+function setPaused(v){paused=v; document.body.classList.toggle('paused',v);
+  $('bPlay').textContent=v?'Play':'Pause'; $('bPlay').setAttribute('aria-label',v?'Play':'Pause')}
+
+/* ---------- text panel ---------- */
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function openPanel(i){const p=POEMS[i];
+  $('panelIn').innerHTML=`<nav class="ctrls">${POEMS.map((q,j)=>`<button data-i="${j}" aria-pressed="${j===i}">${q.code}</button>`).join('')}</nav>
+    <div class="meta">${esc(p.code)} // Journal Poetry // ${esc(p.date)}</div><h2>${esc(p.title||'Untitled')}</h2>
+    ${p.stanzas.map(st=>`<p>${st.map(esc).join('<br>')}</p>`).join('')}`;
+  $('panel').classList.add('open'); $('panel').setAttribute('aria-hidden','false'); $('panel').scrollTop=0;
+  $('panelIn').querySelectorAll('nav button').forEach(bt=>bt.onclick=()=>openPanel(+bt.dataset.i));
+  wasPaused=paused; setPaused(true); $('bClose').focus()}
+let wasPaused=false;
+function closePanel(){$('panel').classList.remove('open'); $('panel').setAttribute('aria-hidden','true'); setPaused(wasPaused); $('bText').focus()}
+
+/* ---------- hash routing (#jp-092324) ---------- */
+let ignoreHash=false;
+function setHash(i){const h='#jp-'+POEMS[i].id; if(location.hash!==h){ignoreHash=true; location.hash=h}}
+function hashIndex(){const m=location.hash.match(/^#jp-(\d{6})$/); if(!m) return -1; return POEMS.findIndex(p=>p.id===m[1])}
+addEventListener('hashchange',()=>{if(ignoreHash){ignoreHash=false;return} const i=hashIndex(); if(i>=0&&i!==cur) jump(i)});
+
+/* ---------- wiring ---------- */
+$('bPrev').onclick=()=>jump(cur-1);
+$('bNext').onclick=()=>jump(cur+1);
+$('bPlay').onclick=()=>setPaused(!paused);
+$('bText').onclick=()=>openPanel(cur);
+$('bClose').onclick=closePanel;
+addEventListener('keydown',e=>{
+  if($('panel').classList.contains('open')){if(e.key==='Escape') closePanel(); return}
+  if(e.key==='ArrowRight') jump(cur+1); else if(e.key==='ArrowLeft') jump(cur-1);
+  else if(e.key===' '){e.preventDefault(); setPaused(!paused)} else if(e.key==='t'||e.key==='T') openPanel(cur)});
+let rz; addEventListener('resize',()=>{clearTimeout(rz); rz=setTimeout(()=>{
+  if(innerWidth===lastW&&Math.abs(innerHeight-lastH)<lastH*0.2) return; layout(); jump(cur)},250)});
+
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function frame(ts){const dt=Math.min(0.1,(ts-last)/1000); last=ts; if(!paused) now+=dt;
+  tickWaiters();
+  b.globalAlpha=1; b.clearRect(0,0,C,R); b.imageSmoothingEnabled=false;
+  ambient(b);
+  E=E.filter(e=>!(e.k&&e.k.dead)&&e.draw(b)!==false);
+  glitch(); composite(); tcEl.textContent=tc();
+  requestAnimationFrame(frame)}
+
+layout(); haze('dark');
+const hi=hashIndex();
+if(hi>=0) run(hi,false); else run(0,true);
+requestAnimationFrame(frame);
+window.__nr={get now(){return now}, get E(){return E}, demo(kind){tok.dead=true; E=[]; const k=tok={dead:false}; const p=POEMS[1]; curPid='092524'; usedMarks=new Set(); markBusy=0;
+  const go={wall:()=>sWall(k,DIRECTION['092424'].walls[0],'092424'),tally:()=>sTally(k,p.stanzas[4],{cum:40}),
+    list:()=>sList(k,POEMS[2].stanzas[3]),scatter:()=>sScatter(k,POEMS[2].stanzas[1]),seq:()=>sSeq(k,p.stanzas[23]),scribble:()=>sScribble(k,Object.keys(DIRECTION['092524'].marks))}[kind];
+   go().catch(()=>{})}};
+})();
+</script>
+</body>
+</html>
