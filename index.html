@@ -127,7 +127,7 @@ body.screening{overflow:hidden}
 <section id="viewer" aria-label="Featured project">
 <div class="vbar">
 <button type="button" class="icon" id="prev" aria-label="Previous project"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6"/></svg></button>
-<span class="count">Projects ( <span id="counter">01 / 12</span> )</span>
+<span class="count">Projects ( <span id="counter">01 / 13</span> )</span>
 <button type="button" class="icon" id="next" aria-label="Next project"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m7.5 4 6 6-6 6"/></svg></button>
 </div>
 <div class="stage" id="stage"></div>
@@ -177,6 +177,7 @@ const P=[
   ['co-1-title','The Company main title on hand-drawn paper texture'],['co-2-tnt','TNT presents, two hares under a drawn sky'],['co-3-sony','In association with Sony Pictures Television, a rocket launch'],['co-4-odonnell','Starring Chris O’Donnell, a drawn box'],['co-5-molina','Alfred Molina, a hare with a white eye'],['co-6-keaton','And Michael Keaton, a figure seen from above'],['co-7-calley','Executive producer John Calley, a mushroom cloud over a city'],['co-8-scott','Executive producers Ridley Scott and Tony Scott, a mushroom in grass'],['co-9-book','An open book of drawings']]},
  {n:'03',title:'Cruel Black Dove _ The Myth and the Sum',tag:'Music packaging',tile:'cbd-tile',fit:'cover',frames:[['cbd-1','Cruel Black Dove, The Myth and the Sum, black box set with white type, front'],['cbd-2','Cruel Black Dove box set, back cover with track list and credits']]},
  {n:'04',title:'New Ruin _ Slither',tag:'Music packaging',tile:'nr-1b-tile',fit:'cover',frames:[['nr-1b','New Ruin, Slither, record sleeve on a concrete ledge under a single light'],['nr-2','New Ruin, Slither, close detail of the sleeve edge and title type']]},
+ {n:'',title:'New Ruin _ Website',tag:'Website',tile:'nrw-tile',fit:'cover',frames:[['nrw-1','New Ruin website, title screen in dot-matrix type'],['nrw-2','Poem code JP_092324 as a dot-matrix title card'],['nrw-3','Journal poem line, The words I say will be what is known'],['nrw-4','Terminal-style poem with typed lines and bitmap blocks'],['nrw-5','Poem lines in a field of scrambled characters, Let it go circled by hand'],['nrw-6','Poem lines with a running word count'],['nrw-7','Wall of repeating output lines'],['nrw-8','Feeling less groggy, not fully awake'],['nrw-9','Typed list with a crossed-out line and underlined words']]},
  {n:'05',title:'Arctic Hospital',tag:'Music promo',tile:'ah-tile',fit:'cover',frames:[{vimeo:'1244331872',poster:'ah-poster',alt:'Arctic Hospital, Cold Wrapper music promo',film:'Cold Wrapper'},['ah-1','Arctic Hospital, Citystream digipak front cover'],['ah-2','Arctic Hospital, Citystream digipak spine'],['ah-3','Arctic Hospital, Citystream back cover and track list'],['ah-4b','Arctic Hospital, Citystream disc'],['ah-5','Arctic Hospital, Citystream digipak opened']]},
  {n:'06',title:'Narita Records _ Label Sleeve',tag:'Vinyl packaging',tile:'narita-sleeve',fit:'cover',frames:[['narita-sleeve','Narita Records 12-inch sleeve, front'],['narita-detail','Narita sleeve, detail of the yellow label in the die-cut window']]},
  {n:'07',title:'Absorber',tag:'Short film _ identity & main titles',tile:'absorber-hi',fit:'contain',frames:[
@@ -186,8 +187,8 @@ const P=[
  {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit-tile',fit:'cover',frames:[{vimeo:'477161035',poster:'revit-poster',alt:"REV'IT!, The Reason, Super 8 film",film:'The Reason',ar:'79/60'},['revit','Rider in a flame-painted helmet']]},
  {n:'11',title:'Logos',tag:'Brand identity',tile:'logo-nr',fit:'cover',frames:[['logo-nr','New Ruin logo'],['logos','noah.tv logomark usage guidelines'],['logo-absorber','Absorber wordmark'],['logo-leaf','Three-leaf mark'],['logo-noahtv','noah.tv logomark'],['logo-narita','Narita Records wordmark'],['logo-totality','Totality wordmark']]},
  {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck-tile',fit:'cover',frames:[['merck-1','Merck Records 12-inch sleeve, hand-drawn line work with a blue logo, front']]}
-].map(p=>({...p,frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film,ar:f.ar})}));
-const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,'wide'],[8,9,10,11,'narrow']];
+].map((p,i)=>({...p,n:String(i+1).padStart(2,'0'),frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo,src:I(f.poster),alt:f.alt,film:f.film,ar:f.ar})}));
+const ROWS=[[0,1,2,3,'narrow'],[4,5,'wide'],[6,7,8,'narrow'],[9,10,11,12,'narrow']];
 const $=id=>document.getElementById(id);
 const tt=t=>t.split(' _ ').map(x=>`<span class="nw">${esc(x)}</span>`).join(' _ ');
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -301,7 +302,7 @@ function markThumb(){
 }
 function renderCaption(){
  const p=P[a];$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;
- $('counter').textContent=p.n+' / 12';
+ $('counter').textContent=p.n+' / '+String(P.length).padStart(2,'0');
  document.querySelectorAll('.tile').forEach(t=>t.setAttribute('aria-current',+t.dataset.i===a));
 }
 function show(nf){ // change frame within project, with a short fade
@@ -311,7 +312,7 @@ function show(nf){ // change frame within project, with a short fade
 }
 function open(i,scroll){
  const st=$('stage');st.classList.add('swap');clearTimeout(swapT);
- swapT=setTimeout(()=>{a=(i+12)%12;f=0;renderCaption();renderThumbs();renderStage();st.classList.remove('swap');
+ swapT=setTimeout(()=>{a=(i+P.length)%P.length;f=0;renderCaption();renderThumbs();renderStage();st.classList.remove('swap');
   if(P[a].frames[0].vimeo)setTimeout(()=>openFilm(a,0),scroll?500:150);},300);
  if(scroll)$('viewer').scrollIntoView({behavior:'smooth',block:'start'});
 }
