@@ -86,6 +86,18 @@ nav .sub{color:var(--muted);margin-right:14px}
 .narrow .tl .g{grid-column:1 / -1}
 .wide .tl .g{grid-column:2;white-space:nowrap;padding-left:16px}
 @media (max-width:700px){.wide .tl .g{grid-column:1 / -1;padding-left:0;white-space:normal}}
+/* about */
+#about{padding:0 0 120px;scroll-margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:40px clamp(24px,5vw,80px);border-top:1px solid var(--rule);padding-top:48px}
+#about h2{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
+.intro{grid-column:2;margin:0;text-transform:none;font-size:clamp(15px,1.25vw,19px);line-height:1.5;max-width:60ch;display:flex;flex-direction:column;gap:1em}
+.intro p{margin:0}
+.cv{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:32px clamp(24px,5vw,80px)}
+.cv h3{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
+.cv ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.cv li{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:16px}
+.cv li span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:700px){#about,.cv{grid-template-columns:minmax(0,1fr)}.intro{grid-column:1}.cv{gap:12px}.cv h3:not(:first-child){margin-top:28px}.cv li{grid-template-columns:minmax(0,1fr);gap:0}.cv li span:first-child:empty{display:none}}
+.credits[hidden]{display:none}
 footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;padding:16px 0 40px;color:var(--muted)}
 footer div{display:flex;flex-wrap:wrap;gap:28px}
 /* screening room */
@@ -119,8 +131,8 @@ body.screening{overflow:hidden}
 <a class="mark home" href="./" aria-label="SAGA, home"><img src="img/saga-logo.png" alt="SAGA" width="265" height="40"></a>
 <nav>
 <a href="#index">Index</a>
-<a href="#">About</a>
-<a href="#">Contact</a>
+<a href="#about">About</a>
+<a href="mailto:hello@saga.art">Contact</a>
 <a class="ig" href="https://www.instagram.com/saga.art.studio/" target="_blank" rel="noopener" aria-label="Saga on Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg></a>
 </nav>
 </header>
@@ -143,11 +155,26 @@ body.screening{overflow:hidden}
 <h2 id="ct"></h2>
 <span class="tag" id="cg"></span>
 </div>
-<p class="credits">[Info / credits]</p>
+<p class="credits" id="cr" hidden></p>
 </section>
 
 <section id="index" aria-label="Index">
 <div id="rows"></div>
+</section>
+
+<section id="about" aria-label="About">
+<h2>About</h2>
+<div class="intro">
+<p>Saga is the design studio of Noah Conopask, a director and designer in Los Angeles. It makes identities for films and music: main titles, logotypes, packaging and the pieces that move.</p>
+<p>Noah also directs, shoots, edits and scores, so a Saga identity can have motion and sound from the start. Most projects are small and close to the artist.</p>
+</div>
+<div class="cv">
+<h3>Studios</h3><ul><li><span>2026 - Present</span><span>ArtClass, Los Angeles _ Director</span></li><li><span>2021 - 2026</span><span>DOMO, Los Angeles _ Director</span></li><li><span>2018 - 2021</span><span>Bullitt, Los Angeles _ Director</span></li><li><span>2012 - 2018</span><span>The Sweetshop, Los Angeles _ Director</span></li><li><span>2008 - 2012</span><span>Shilo, New York _ Associate Creative Director</span></li><li><span>2003 - 2008</span><span>Digital Kitchen, Chicago _ Associate Creative Director</span></li></ul>
+<h3>Selected Work</h3><ul><li><span>2026</span><span>Absorber _ Identity & main titles</span></li><li><span>2023</span><span>American Symphony _ Main titles _ Netflix</span></li><li><span>2020</span><span>The Reason _ Film _ REV'IT!</span></li><li><span>2007</span><span>The Company _ Main titles _ TNT</span></li></ul>
+<h3>Recognition</h3><ul><li><span>2026</span><span>Best Horror Short _ Indie Short Fest _ Absorber</span></li><li><span>2026</span><span>Official Selection _ LA Shorts International Film Festival _ Absorber</span></li><li><span>2021</span><span>Webby Honoree _ Branded Sports Content _ The Reason</span></li><li><span>2020</span><span>Best Documentary Short _ Los Angeles Film Awards _ The Reason</span></li><li><span>2020</span><span>Best Commercial _ Top Shorts</span></li><li><span>2008</span><span>Emmy Nomination _ Outstanding Main Title Design _ The Company</span></li><li><span></span><span>Gold _ Ciclope Festival _ BBC Commonwealth Games</span></li><li><span></span><span>Clio Awards</span></li><li><span></span><span>CAANZ AXIS Awards</span></li></ul>
+<h3>Press</h3><ul><li><span>2026</span><span>Shots</span></li><li><span>2026</span><span>Shoot Online</span></li><li><span>2026</span><span>Little Black Book</span></li><li><span>2021</span><span>Little Black Book _ The Directors</span></li></ul>
+<h3>Contact</h3><ul><li><span>Email</span><span><a href="mailto:hello@saga.art">hello@saga.art</a></span></li><li><span>Instagram</span><span><a href="https://www.instagram.com/saga.art.studio/" target="_blank" rel="noopener">@saga.art.studio</a></span></li></ul>
+</div>
 </section>
 
 <footer>
@@ -155,7 +182,7 @@ body.screening{overflow:hidden}
 <div>
 <a href="https://noah.tv">noah.tv</a>
 <a href="https://www.instagram.com/noahconopask">Instagram</a>
-<a href="#">[CONTACT EMAIL]</a>
+<a href="mailto:hello@saga.art">hello@saga.art</a>
 </div>
 </footer>
 </div>
@@ -173,9 +200,9 @@ body.screening{overflow:hidden}
 <script>
 const I=n=>'img/'+n+'.jpg';
 const P=[
- {n:'01',title:'American Symphony',tag:'Film identity & main titles',tile:'american-symphony-hi',fit:'contain',aspect:'16 / 9',frames:[
+ {n:'01',title:'American Symphony',tag:'Film identity & main titles',cr:'2023 _ Netflix _ Directed by Matthew Heineman',tile:'american-symphony-hi',fit:'contain',aspect:'16 / 9',frames:[
   ['as-1-title','American Symphony main title over a pale sky with a line of birds'],['as-2-netflix','A Netflix Documentary title card'],['as-3-heineman','A film by Matthew Heineman, over a close profile of Jon Batiste'],['as-4-batiste','Music by Jon Batiste, over a lake at dusk'],['as-5-ourtime','An Our Time Projects production, over moving water'],['as-6-endcard','End title card']]},
- {n:'02',title:'The Company',tag:'Main titles',tile:'the-company-hi',fit:'contain',frames:[
+ {n:'02',title:'The Company',tag:'Main titles',cr:'2007 _ TNT _ Lead designer at Digital Kitchen _ Emmy nomination, Outstanding Main Title Design',tile:'the-company-hi',fit:'contain',frames:[
   {vimeo:'479053999',poster:'co-1-title',alt:'The Company main title sequence',film:'Main title sequence'},
   ['co-1-title','The Company main title on hand-drawn paper texture'],['co-2-tnt','TNT presents, two hares under a drawn sky'],['co-3-sony','In association with Sony Pictures Television, a rocket launch'],['co-4-odonnell','Starring Chris O’Donnell, a drawn box'],['co-5-molina','Alfred Molina, a hare with a white eye'],['co-6-keaton','And Michael Keaton, a figure seen from above'],['co-7-calley','Executive producer John Calley, a mushroom cloud over a city'],['co-8-scott','Executive producers Ridley Scott and Tony Scott, a mushroom in grass'],['co-9-book','An open book of drawings']]},
  {n:'03',title:'Cruel Black Dove _ The Myth and the Sum',tag:'Music packaging',tile:'cbd-tile',fit:'cover',frames:[['cbd-1','Cruel Black Dove, The Myth and the Sum, black box set with white type, front'],['cbd-2','Cruel Black Dove box set, back cover with track list and credits']]},
@@ -183,11 +210,11 @@ const P=[
  {n:'',title:'New Ruin _ Website',tag:'Website',tile:'nrw-tile',fit:'cover',frames:[{site:'new-ruin/',poster:'nrw-1',alt:'New Ruin website, running live',film:'Live site',ar:'3/2'},['nrw-1','New Ruin website, title screen in dot-matrix type'],['nrw-2','Poem code JP_092324 as a dot-matrix title card'],['nrw-3','Journal poem line, The words I say will be what is known'],['nrw-4','Terminal-style poem with typed lines and bitmap blocks'],['nrw-5','Poem lines in a field of scrambled characters, Let it go circled by hand'],['nrw-6','Poem lines with a running word count'],['nrw-7','Wall of repeating output lines'],['nrw-8','Feeling less groggy, not fully awake'],['nrw-9','Typed list with a crossed-out line and underlined words']]},
  {n:'05',title:'Arctic Hospital',tag:'Music promo',tile:'ah-tile',fit:'cover',frames:[{vimeo:'1244331872',poster:'ah-poster',alt:'Arctic Hospital, Cold Wrapper music promo',film:'Cold Wrapper'},['ah2-1','Arctic Hospital, Citystream digipak front cover'],['ah2-2','Arctic Hospital, Citystream spine'],['ah2-3','Arctic Hospital, Citystream back cover and track list'],['ah2-4','Arctic Hospital, Citystream disc'],['ah2-5','Arctic Hospital, Citystream digipak opened']]},
  {n:'06',title:'Narita Records _ Label Sleeve',tag:'Vinyl packaging',tile:'narita-sleeve',fit:'cover',frames:[['narita-sleeve','Narita Records 12-inch sleeve, front'],['narita-detail','Narita sleeve, detail of the yellow label in the die-cut window']]},
- {n:'07',title:'Absorber',tag:'Short film _ identity & main titles',tile:'absorber-hi',fit:'contain',frames:[
+ {n:'07',title:'Absorber',tag:'Short film _ identity & main titles',cr:'2026 _ Pillage Corp _ Written, directed and scored by Noah Conopask',tile:'absorber-hi',fit:'contain',frames:[
   ['ab-1-title','Absorber main title over a dark desert horizon at sunrise'],['ab-2-sheet','End title sequence, contact sheet of all credit cards'],['ab-3-written','Written, directed and scored by Noah Conopask'],['ab-4-cast','Cast credit: Grant Narasin, Annika Ross'],['ab-5-dop','Director of photography Eric Ulbrich'],['ab-6-aerials','Aerials provided by Lithium Aerials, pilot Aaron Cohan'],['ab-7-pas','Production assistants credit'],['ab-8-track','Opening track The Siren by New Ruin'],['ab-9-pillage','A Pillage Corp production']]},
  {n:'08',title:'Totality',tag:'Film identity & main titles',tile:'tot-1-tile',fit:'cover',frames:[['tot-1','Totality title over a total solar eclipse'],['logo-totality','Totality wordmark']]},
  {n:'09',title:'Anders Ilar _ Nightwidth',tag:'Music packaging',tile:'ai-tile',fit:'cover',frames:[['ai-1','Nightwidth package, front cover'],['ai-2','Nightwidth package at an angle, with spine'],['ai-3','Nightwidth back cover with track list and credits'],['ai-4','Nightwidth spine with barcode'],['ai-5','Nightwidth opened, interior with disc'],['ai-6','Nightwidth disc, close detail'],['ai-7','Nightwidth stencil type and moon, close detail']]},
- {n:'10',title:"REV'IT!",tag:'Film & photography',tile:'revit-tile',fit:'cover',frames:[{vimeo:'477161035',poster:'revit-poster',alt:"REV'IT!, The Reason, Super 8 film",film:'The Reason',ar:'79/60'},['revit','Rider in a flame-painted helmet']]},
+ {n:'10',title:"REV'IT!",tag:'Film & photography',cr:'2020 _ The Reason _ Webby Honoree, Branded Sports Content',tile:'revit-tile',fit:'cover',frames:[{vimeo:'477161035',poster:'revit-poster',alt:"REV'IT!, The Reason, Super 8 film",film:'The Reason',ar:'79/60'},['revit','Rider in a flame-painted helmet']]},
  {n:'11',title:'Logos',tag:'Brand identity',tile:'logo-nr',fit:'cover',frames:[['logo-nr','New Ruin logo'],['logos','noah.tv logomark usage guidelines'],['logo-absorber','Absorber wordmark'],['logo-leaf','Three-leaf mark'],['logo-noahtv','noah.tv logomark'],['logo-narita','Narita Records wordmark'],['logo-totality','Totality wordmark']]},
  {n:'12',title:'Merck Records _ Label Sleeve',tag:'Vinyl packaging',tile:'merck-tile',fit:'cover',frames:[['merck-1','Merck Records 12-inch sleeve, hand-drawn line work with a blue logo, front']]}
 ].map((p,i)=>({...p,n:String(i+1).padStart(2,'0'),frames:p.frames.map(f=>Array.isArray(f)?{src:I(f[0]),alt:f[1]}:{vimeo:f.vimeo||f.site,site:f.site,src:I(f.poster),alt:f.alt,film:f.film,ar:f.ar})}));
@@ -305,7 +332,7 @@ function markThumb(){
  if(l<c.scrollLeft)c.scrollTo({left:l-4});else if(r>c.scrollLeft+c.clientWidth)c.scrollTo({left:r-c.clientWidth+4});
 }
 function renderCaption(){
- const p=P[a];$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;
+ const p=P[a];$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;const cr=$('cr');cr.textContent=p.cr||'';cr.hidden=!p.cr;
  $('counter').textContent=p.n+' / '+String(P.length).padStart(2,'0');
  document.querySelectorAll('.tile').forEach(t=>t.setAttribute('aria-current',+t.dataset.i===a));
 }
