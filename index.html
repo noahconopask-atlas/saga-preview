@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preload" href="fonts/AlteHaasGrotesk.woff2" as="font" type="font/woff2" crossorigin>
 <title>SAGA _ Designing Visual Futures</title>
 <meta name="description" content="Saga is Noah Conopask's design and moving-image studio in Los Angeles. Designing Visual Futures. For Film, Brands + Culture.">
 <meta property="og:title" content="SAGA _ Designing Visual Futures">
@@ -27,7 +28,8 @@ nav{display:flex;flex-wrap:wrap;column-gap:14px;row-gap:4px;align-items:baseline
 nav a{padding:14px 0}
 nav a.ig{align-self:center;display:flex;padding:14px 0 14px 2px}
 nav .sub{color:var(--muted);margin-right:14px}
-.lede{padding:96px 0 56px;margin:0;max-width:none;font-size:min(clamp(28px,3.4vw,46px),calc((100vw - 2 * clamp(20px,5vw,80px)) / 16.6));line-height:1.12;font-weight:400;letter-spacing:-.02em;text-transform:none;color:#808080}
+@font-face{font-family:'Alte Haas Grotesk';src:url(fonts/AlteHaasGrotesk.woff2) format('woff2');font-weight:400;font-display:swap}
+.lede{font-family:'Alte Haas Grotesk','Helvetica Neue',Arial,sans-serif;padding:96px 0 56px;margin:0;max-width:none;font-size:min(clamp(28px,3.4vw,46px),calc((100vw - 2 * clamp(20px,5vw,80px)) / 13));line-height:1.12;font-weight:400;letter-spacing:-.02em;text-transform:none;color:#808080}
 
 /* viewer */
 #viewer{scroll-margin-top:24px}
@@ -89,7 +91,7 @@ nav .sub{color:var(--muted);margin-right:14px}
 /* about */
 #about{padding:0 0 120px;scroll-margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:40px clamp(24px,5vw,80px);border-top:1px solid var(--rule);padding-top:48px}
 #about h2{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
-.intro{grid-column:2;margin:0;text-transform:none;font-size:clamp(15px,1.25vw,19px);line-height:1.5;max-width:60ch;display:flex;flex-direction:column;gap:1em}
+.intro{grid-column:2;margin:0;text-transform:none;font-family:'Alte Haas Grotesk','Helvetica Neue',Arial,sans-serif;font-size:clamp(17px,1.45vw,22px);line-height:1.4;max-width:60ch;display:flex;flex-direction:column;gap:1em}
 .intro p{margin:0}
 .cv{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:32px clamp(24px,5vw,80px)}
 .cv h3{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
