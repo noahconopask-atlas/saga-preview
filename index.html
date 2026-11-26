@@ -99,6 +99,26 @@ nav .sub{color:var(--muted);margin-right:14px}
 .narrow .tl .g{grid-column:1 / -1}
 .wide .tl .g{grid-column:2;white-space:nowrap;padding-left:16px}
 @media (max-width:700px){.wide .tl .g{grid-column:1 / -1;padding-left:0;white-space:normal}}
+/* offer */
+#offer{padding:0 0 160px;scroll-margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:72px clamp(24px,5vw,80px)}
+#offer h2,#offer h3{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
+#offer .sans{text-transform:none;font-family:'Alte Haas Grotesk','Helvetica Neue',Arial,sans-serif}
+.otitle{margin:0 0 .7em;font-size:clamp(28px,3.4vw,46px);line-height:1.05;letter-spacing:-.02em}
+.oprose{font-size:clamp(17px,1.45vw,22px);line-height:1.4;max-width:60ch;display:flex;flex-direction:column;gap:1em}
+.oprose p{margin:0}
+.ofacts{margin:0;display:flex;flex-direction:column;gap:4px}
+.ofacts div,.weeks li{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:16px}
+.ofacts dt,.weeks .wl,.addons .ap{color:var(--muted)}
+.ofacts dd{margin:0}
+.weeks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:40px}
+.weeks b{font-weight:400;display:block;margin-bottom:6px}
+.weeks p,.addons p{margin:0;font-size:clamp(15px,1.15vw,17px);line-height:1.45;max-width:56ch}
+.oget{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 24px}
+.addons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px}
+.addons article{display:flex;flex-direction:column;gap:8px}
+.addons a{align-self:flex-start;padding:10px 0}
+.octa .btn{display:inline-flex;align-items:center;margin-top:28px;background:var(--fg);color:var(--bg);padding:14px 20px;min-height:44px}
+@media (max-width:700px){#offer{grid-template-columns:minmax(0,1fr);gap:24px}#offer>h3{margin-top:40px}.ofacts div,.weeks li{grid-template-columns:minmax(0,1fr);gap:0}.oget,.addons{grid-template-columns:minmax(0,1fr)}.weeks{gap:28px}}
 /* about */
 #about{padding:0 0 120px;scroll-margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:40px clamp(24px,5vw,80px);border-top:1px solid var(--rule);padding-top:48px}
 #about h2{margin:0;font-size:inherit;font-weight:400;color:var(--muted)}
@@ -144,6 +164,7 @@ body.screening{overflow:hidden}
 <a class="mark home" href="./" aria-label="SAGA, home"><img src="img/saga-logo.png" alt="SAGA" width="265" height="40"></a>
 <nav>
 <a href="#index">Index</a>
+<a href="#offer">Offer</a>
 <a href="#about">About</a>
 <a href="mailto:hello@saga.art">Contact</a>
 <a class="ig" href="https://www.instagram.com/saga.art.studio/" target="_blank" rel="noopener" aria-label="Saga on Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg></a>
@@ -174,6 +195,44 @@ body.screening{overflow:hidden}
 
 <section id="index" aria-label="Index">
 <div id="rows"></div>
+</section>
+
+<section id="offer" aria-label="Offer">
+<h2>Offer</h2>
+<div>
+<p class="otitle sans">The Saga Identity</p>
+<div class="oprose sans">
+<p>Saga is a team led by an Emmy-nominated, multi-award-winning director and designer. We make identities that move and sound.</p>
+<p>A complete identity with an animated logo and a sound mark, finished in three weeks for a fixed fee. For companies about to launch or relaunch: AI and software, games, sport and performance, entertainment.</p>
+</div>
+</div>
+<dl class="ofacts">
+<div><dt>Fee</dt><dd>$30,000, fixed</dd></div>
+<div><dt>Timeline</dt><dd>3 weeks</dd></div>
+<div><dt>Payment</dt><dd>50% to start</dd></div>
+<div><dt>Capacity</dt><dd>One project at a time</dd></div>
+</dl>
+<ol class="weeks">
+<li><span class="wl">Week 01</span><div><b>Kickoff and directions</b><p class="sans">An hour on the business, an hour on the brand. Two directions shown live by the end of the week.</p></div></li>
+<li><span class="wl">Week 02</span><div><b>Identity</b><p class="sans">Logotype, mark, type and color for the direction you pick, locked by the end of the week.</p></div></li>
+<li><span class="wl">Week 03</span><div><b>Motion, sound and handoff</b><p class="sans">The logo animated and a sound mark scored for the brand. Then the identity on your website and in your product, and the final files.</p></div></li>
+</ol>
+<h3>What you get</h3>
+<ul class="oget">
+<li>Logotype and mark</li><li>Sound mark</li>
+<li>Type and color system</li><li>Website and product mockups</li>
+<li>Animated logo</li><li>Guidelines and final files</li>
+</ul>
+<h3>Add-ons</h3>
+<div class="addons">
+<article><span class="ap">01 _ +2 weeks _ $12,000</span><b style="font-weight:400">Motion system</b><p class="sans">Transitions, title cards and the rules for how the brand moves. Comes with a toolkit your team keeps using after we finish: animation templates, LUTs, sound files and edit presets.</p></article>
+<article><span class="ap">02 _ Quoted on its own</span><b style="font-weight:400">Launch film</b><p class="sans">Noah directs the launch film with the new identity. He has made commercials for BMW, Nike, Red Bull and JPMorganChase.</p><a href="https://noah.tv" target="_blank" rel="noopener">Director's reel at noah.tv ↗</a></article>
+</div>
+<h3>Start a project</h3>
+<div class="octa">
+<div class="oprose sans"><p>Send a few references you love. Add a line about what the company does and when it launches. If it looks like a fit, we set up a call.</p></div>
+<a class="btn" href="mailto:hello@saga.art?subject=Saga%20Identity%20inquiry&amp;body=Name%3A%0D%0ACompany%3A%0D%0ALaunch%20date%3A%0D%0AReferences%20(links)%3A%0D%0AWhat%20the%20company%20does%3A%0D%0A">Email hello@saga.art ↗</a>
+</div>
 </section>
 
 <section id="about" aria-label="About">
