@@ -71,6 +71,17 @@ nav .sub{color:var(--muted);margin-right:14px}
 .cap .state:hover{color:var(--fg)}
 .cap .state[hidden]{display:none}
 .credits{margin:6px 0 0;color:var(--muted)}
+/* case study */
+.case{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:32px clamp(24px,5vw,80px);padding-top:48px}
+.case[hidden]{display:none}
+.case dl{margin:0;display:flex;flex-direction:column;gap:4px}
+.case dl div{display:grid;grid-template-columns:13em minmax(0,1fr);gap:16px}
+.case dt{color:var(--muted)}
+.case dd{margin:0}
+.case .body{grid-column:2;grid-row:1;text-transform:none;font-family:'Alte Haas Grotesk','Helvetica Neue',Arial,sans-serif;font-size:clamp(17px,1.45vw,22px);line-height:1.4;max-width:60ch;display:flex;flex-direction:column;gap:1em}
+.case .body p{margin:0}
+.case dl{grid-column:1;grid-row:1}
+@media (max-width:700px){.case{grid-template-columns:minmax(0,1fr)}.case .body,.case dl{grid-column:1;grid-row:auto}.case dl div{grid-template-columns:minmax(0,1fr);gap:0}}
 
 /* index */
 #index{padding:112px 0 120px;display:flex;flex-direction:column;gap:48px}
@@ -158,6 +169,7 @@ body.screening{overflow:hidden}
 <span class="tag" id="cg"></span>
 </div>
 <p class="credits" id="cr" hidden></p>
+<div class="case" id="case" hidden><div class="body" id="cbody"></div><dl id="cdl"></dl></div>
 </section>
 
 <section id="index" aria-label="Index">
@@ -202,7 +214,13 @@ body.screening{overflow:hidden}
 <script>
 const I=n=>'img/'+n+'.jpg';
 const P=[
- {n:'01',title:'American Symphony',tag:'Film identity & main titles',cr:'2023 _ Netflix _ Directed by Matthew Heineman',tile:'american-symphony-hi',fit:'contain',aspect:'16 / 9',frames:[
+ {n:'01',title:'American Symphony',tag:'Film identity & main titles',
+  desc:["Title design for Matthew Heineman’s Netflix documentary featuring Jon Batiste and Suleika Jaouad.",
+   "Jon Batiste is preparing an original symphony for Carnegie Hall when his wife, writer Suleika Jaouad, learns that her cancer has returned. Directed by Academy Award–nominated filmmaker Matthew Heineman, American Symphony follows the couple through a year in which professional success and private uncertainty become inseparable.",
+   "Noah Conopask collaborated with RCO on the film’s title design, working with founder Seth Ricart and senior producer Sheina Dao. The work formed part of the documentary’s on-screen presentation, alongside Heineman’s filmmaking and Batiste’s music.",
+   "An Our Time Projects production with Mercury Studios, in association with Higher Ground Productions, American Symphony counts Barack and Michelle Obama among its executive producers. The film premiered at the 2023 Telluride Film Festival before its release on Netflix and went on to win the 2025 Grammy Award for Best Music Film."],
+  credits:[['Title design','Noah Conopask'],['In collaboration with','RCO'],['RCO team','Seth Ricart, Sheina Dao'],['Directed by','Matthew Heineman'],['Featuring','Jon Batiste, Suleika Jaouad'],['Distribution','Netflix'],['Year','2023']],
+  tile:'american-symphony-hi',fit:'contain',aspect:'16 / 9',frames:[
   ['as-1-title','American Symphony main title over a pale sky with a line of birds'],['as-2-netflix','A Netflix Documentary title card'],['as-3-heineman','A film by Matthew Heineman, over a close profile of Jon Batiste'],['as-4-batiste','Music by Jon Batiste, over a lake at dusk'],['as-5-ourtime','An Our Time Projects production, over moving water'],['as-6-endcard','End title card']]},
  {n:'02',title:'The Company',tag:'Main titles',cr:'2007 _ TNT _ Lead designer at Digital Kitchen _ Emmy nomination, Outstanding Main Title Design',tile:'the-company-hi',fit:'contain',frames:[
   {vimeo:'479053999',poster:'co-1-title',alt:'The Company main title sequence',film:'Main title sequence'},
@@ -318,7 +336,7 @@ function startAuto(){if(RM||P.length<2)return;auto=true;renderStage();schedule()
 function stopAuto(){
  if(!auto)return;auto=false;clearTimeout(autoT);clearTimeout(xfT);
  $('stage').querySelectorAll('.xf').forEach(x=>x.remove());
- renderStage();
+ renderStage();renderCaption();
 }
 document.addEventListener('visibilitychange',()=>{if(auto&&!document.hidden)schedule();});
 function renderThumbs(){
@@ -336,6 +354,9 @@ function markThumb(){
 function renderCaption(){
  const p=P[a];$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;const cr=$('cr');cr.textContent=p.cr||'';cr.hidden=!p.cr;
  $('counter').textContent=p.n+' / '+String(P.length).padStart(2,'0');
+ const cs=$('case'),has=!auto&&!!p.desc;cs.hidden=!has;
+ $('cbody').innerHTML=has?p.desc.map(x=>`<p>${esc(x)}</p>`).join(''):'';
+ $('cdl').innerHTML=has?(p.credits||[]).map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join(''):'';
  document.querySelectorAll('.tile').forEach(t=>t.setAttribute('aria-current',+t.dataset.i===a));
 }
 function show(nf){ // change frame within project, with a short fade
