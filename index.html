@@ -80,6 +80,8 @@ nav .sub{color:var(--muted);margin-right:14px}
 .case dd{margin:0}
 .case .body{grid-column:2;grid-row:1;text-transform:none;font-family:'Alte Haas Grotesk','Helvetica Neue',Arial,sans-serif;font-size:clamp(17px,1.45vw,22px);line-height:1.4;max-width:60ch;display:flex;flex-direction:column;gap:1em}
 .case .body p{margin:0}
+.case .links{display:flex;flex-wrap:wrap;gap:4px 24px;font-family:'Roboto Mono',ui-monospace,monospace;font-size:clamp(10px,.714vw,12px);text-transform:uppercase;margin-top:8px}
+.case .links a{padding:10px 0}
 .case dl{grid-column:1;grid-row:1}
 @media (max-width:700px){.case{grid-template-columns:minmax(0,1fr)}.case .body,.case dl{grid-column:1;grid-row:auto}.case dl div{grid-template-columns:minmax(0,1fr);gap:0}}
 
@@ -293,7 +295,13 @@ const P=[
  {n:'03',title:'Cruel Black Dove _ The Myth and the Sum',tag:'Music packaging',tile:'cbd-tile',fit:'cover',frames:[['cbd-1','Cruel Black Dove, The Myth and the Sum, black box set with white type, front'],['cbd-2','Cruel Black Dove box set, back cover with track list and credits']]},
  {n:'04',title:'New Ruin _ Slither',tag:'Music packaging',tile:'nr-1b-tile',fit:'cover',frames:[['nr-1b','New Ruin, Slither, record sleeve on a concrete ledge under a single light'],['nr-2','New Ruin, Slither, close detail of the sleeve edge and title type']]},
  {n:'',title:'New Ruin _ Website',tag:'Website',tile:'nrw-tile',fit:'cover',frames:[{site:'https://www.newruin.com/',poster:'nrw-1',alt:'New Ruin website, running live',film:'Live site',ar:'3/2'},['nrw-1','New Ruin website, title screen in dot-matrix type'],['nrw-10','New Ruin website, Journal Spreads page with scanned journal pages for sale'],['nrw-2','Poem code JP_092324 as a dot-matrix title card'],['nrw-3','Journal poem line, The words I say will be what is known'],['nrw-4','Terminal-style poem with typed lines and bitmap blocks'],['nrw-5','Poem lines in a field of scrambled characters, Let it go circled by hand'],['nrw-6','Poem lines with a running word count'],['nrw-7','Wall of repeating output lines'],['nrw-8','Feeling less groggy, not fully awake'],['nrw-9','Typed list with a crossed-out line and underlined words']]},
- {n:'05',title:'Arctic Hospital',tag:'Music promo',tile:'ah-tile',fit:'cover',frames:[{vimeo:'1244331872',poster:'ah-poster',alt:'Arctic Hospital, Cold Wrapper music promo',film:'Cold Wrapper'},['ah2-1','Arctic Hospital, Citystream digipak front cover'],['ah2-2','Arctic Hospital, Citystream spine'],['ah2-3','Arctic Hospital, Citystream back cover and track list'],['ah2-4','Arctic Hospital, Citystream disc'],['ah2-5','Arctic Hospital, Citystream digipak opened']]},
+ {n:'05',title:'Arctic Hospital _ Citystream',tag:'Music promo',
+  desc:["Art direction, packaging, custom typography and an accompanying music visualizer for Narita Records.",
+   "For Arctic Hospital’s Citystream, Noah developed a visual world around the music through graphic design and moving image. The album artwork established its identity, while an accompanying experimental art film expanded that world through motion.",
+   "The project reflects SAGA’s approach to music releases: developing the artwork and film together so they share a creative direction. The visualizer gives the listener another way into the record, extending the atmosphere of the music beyond its packaging."],
+  credits:[['Design','Noah Conopask'],['Visualizer','Noah Conopask'],['Artist','Arctic Hospital (Eric Bray)'],['Label','Narita Records']],
+  links:[['Apple Music','https://music.apple.com/us/album/citystream/192464288'],['Spotify','https://open.spotify.com/artist/75OjwSiJhBWDHEeASA446d'],['Bandcamp','https://arctichospital.bandcamp.com/album/citystream']],
+  tile:'ah-tile',fit:'cover',frames:[{vimeo:'1244331872',poster:'ah-poster',alt:'Arctic Hospital, Cold Wrapper music promo',film:'Cold Wrapper'},['ah2-1','Arctic Hospital, Citystream digipak front cover'],['ah2-2','Arctic Hospital, Citystream spine'],['ah2-3','Arctic Hospital, Citystream back cover and track list'],['ah2-4','Arctic Hospital, Citystream disc'],['ah2-5','Arctic Hospital, Citystream digipak opened']]},
  {n:'06',title:'Narita Records _ Label Sleeve',tag:'Vinyl packaging',tile:'narita-sleeve',fit:'cover',frames:[['narita-sleeve','Narita Records 12-inch sleeve, front'],['narita-detail','Narita sleeve, detail of the yellow label in the die-cut window']]},
  {n:'07',title:'Absorber',tag:'Short film _ identity & main titles',
   desc:["Main title and end-credit design for Noah Conopask’s award-winning horror short.",
@@ -431,7 +439,7 @@ function renderCaption(){
  const p=P[a];$('ct').innerHTML=tt(p.title);$('cg').textContent=p.tag;const cr=$('cr');cr.textContent=p.cr||'';cr.hidden=!p.cr;
  $('counter').textContent=p.n+' / '+String(P.length).padStart(2,'0');
  const cs=$('case'),has=!auto&&!!p.desc;cs.hidden=!has;
- $('cbody').innerHTML=has?p.desc.map(x=>`<p>${esc(x)}</p>`).join(''):'';
+ $('cbody').innerHTML=has?p.desc.map(x=>`<p>${esc(x)}</p>`).join('')+(p.links?`<div class="links">${p.links.map(([k,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(k)} ↗</a>`).join('')}</div>`:''):'';
  $('cdl').innerHTML=has?(p.credits||[]).map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join(''):'';
  document.querySelectorAll('.tile').forEach(t=>t.setAttribute('aria-current',+t.dataset.i===a));
 }
